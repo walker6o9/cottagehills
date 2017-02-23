@@ -1,0 +1,28 @@
+name = Restaurant SEO
+description = SEO for the Restaurant Distribution
+core = 7.x
+package = Open Restaurant
+project = restaurant_seo
+dependencies[] = ctools
+dependencies[] = defaultconfig
+dependencies[] = metatag
+dependencies[] = panopoly_seo
+dependencies[] = strongarm
+features[ctools][] = strongarm:strongarm:1
+features[defaultconfig][] = strongarm:clean_url
+features[features_api][] = api:2
+features[metatag][] = global
+features[metatag][] = global:403
+features[metatag][] = global:404
+features[metatag][] = global:frontpage
+features[metatag][] = node
+features[metatag][] = taxonomy_term
+features[metatag][] = user
+features[variable][] = clean_url
+
+; Information added by Drupal.org packaging script on 2016-11-21
+version = "7.x-1.14"
+core = "7.x"
+project = "restaurant"
+datestamp = "1479744140"
+
