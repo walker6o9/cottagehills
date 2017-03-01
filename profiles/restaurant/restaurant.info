@@ -72,9 +72,9 @@ copyright = Drupal is a registered trademark of Dries Buytaert.
 guide[url] = https://github.com/openrestaurant/help
 guide[version] = master
 
-; Information added by Drupal.org packaging script on 2016-11-21
-version = "7.x-1.14"
+; Information added by Drupal.org packaging script on 2017-02-23
+version = "7.x-1.15"
 core = "7.x"
 project = "restaurant"
-datestamp = "1479744140"
+datestamp = "1487870978"
 

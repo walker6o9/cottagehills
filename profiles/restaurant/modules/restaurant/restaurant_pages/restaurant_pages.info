@@ -26,9 +26,9 @@ features_exclude[features_overrides][field_instance.fieldable_panels_pane-spotli
 features_exclude[features_overrides][page_manager_handlers.pm_existing_pages_events_calendar_month_page_panel_context.conf|display|content|new-833b10ef-f720-43cf-82a6-cd5c77f83b79] = page_manager_handlers.pm_existing_pages_events_calendar_month_page_panel_context.conf|display|content|new-833b10ef-f720-43cf-82a6-cd5c77f83b79
 features_exclude[features_overrides][page_manager_handlers.pm_existing_pages_events_calendar_month_page_panel_context.conf|display|panels|contentmain|2] = page_manager_handlers.pm_existing_pages_events_calendar_month_page_panel_context.conf|display|panels|contentmain|2
 
-; Information added by Drupal.org packaging script on 2016-11-21
-version = "7.x-1.14"
+; Information added by Drupal.org packaging script on 2017-02-23
+version = "7.x-1.15"
 core = "7.x"
 project = "restaurant"
-datestamp = "1479744140"
+datestamp = "1487870978"
 

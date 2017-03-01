@@ -92,9 +92,9 @@ features_exclude[dependencies][views] = views
 features_exclude[field_base][field_event_featured_image] = field_event_featured_image
 features_exclude[field_instance][node-event-field_event_featured_image] = node-event-field_event_featured_image
 
-; Information added by Drupal.org packaging script on 2016-11-21
-version = "7.x-1.14"
+; Information added by Drupal.org packaging script on 2017-02-23
+version = "7.x-1.15"
 core = "7.x"
 project = "restaurant"
-datestamp = "1479744140"
+datestamp = "1487870978"
 

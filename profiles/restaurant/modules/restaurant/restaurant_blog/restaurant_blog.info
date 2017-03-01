@@ -77,9 +77,9 @@ features_exclude[uuid_term][4542cd44-3283-4821-92d7-1863f747375a] = 4542cd44-328
 features_exclude[uuid_term][a7e5ca5d-53c5-4aae-a9f5-cfffaed900e7] = a7e5ca5d-53c5-4aae-a9f5-cfffaed900e7
 features_exclude[uuid_term][8c6a813a-4184-4896-8463-42eb73ac9274] = 8c6a813a-4184-4896-8463-42eb73ac9274
 
-; Information added by Drupal.org packaging script on 2016-11-21
-version = "7.x-1.14"
+; Information added by Drupal.org packaging script on 2017-02-23
+version = "7.x-1.15"
 core = "7.x"
 project = "restaurant"
-datestamp = "1479744140"
+datestamp = "1487870978"
 
