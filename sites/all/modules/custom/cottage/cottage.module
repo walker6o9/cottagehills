@@ -1,0 +1,64 @@
+<?php
+function cottage_node_postinsert($node){
+
+  $type = $node->type;
+
+      switch ($type) {
+        case 'menu':
+
+        //node
+        //field_data_field_menu_variants
+        //commerce_product
+        
+       $query = db_select('field_data_field_menu_variants', 'n')
+        ->fields('n', array('field_menu_variants_product_id'))
+        ->condition('entity_id', $node->nid,'=');
+        $result = $query->execute();
+        $product_id = $result->fetchField();
+        
+        $query = db_select('field_data_body', 'n')
+        ->fields('n', array('entity_id'))
+        ->condition('entity_id', $node->nid,'=');
+        $result = $query->execute();
+        $data = $result->fetchField();
+        
+        if(empty($data)){
+          $result = db_insert('field_data_body')
+          ->fields(array(
+            'entity_type' => 'node',
+            'bundle' => 'menu',
+            'deleted'  => 0,
+            'entity_id' => $node->nid,
+            'revision_id' => $node->nid,
+            'language' => 'und',
+            'delta' => 0,
+            'body_value' => '[product-button:'./*$node->nid*/$product_id.' title=Add to Cart]',
+            //'body_value' => '[product-button:1 title=Add to Cart]',
+            'body_format' => 'panopoly_html_text',
+          ))
+          ->execute();
+          //dpm($nid);
+        }else{
+          
+        $query = db_select('field_data_body', 'n')
+        ->fields('n', array('body_value'))
+       // ->condition('entity_id', $node->nid,'=')
+        ->condition('entity_id', $node->nid,'=');        
+        $result = $query->execute();
+        $body = $result->fetchField();          
+          
+          
+          
+          $table_updated = db_update('field_data_body') // 
+           ->fields(array(
+           'body_value' => $body.'<br>'.'[product-button:'./*$node->nid*/$product_id.' title=Add to Cart]',    
+           'body_format' => 'panopoly_html_text',
+           ))
+           ->condition('entity_id', $node->nid,'=')
+           ->execute();
+        }
+          break;
+        
+      }
+ 
+}

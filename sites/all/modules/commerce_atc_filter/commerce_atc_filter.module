@@ -1,0 +1,75 @@
+<?php
+/**
+ * @file
+ * Provide custom filter to replace [product-button:PRODUCTID title=BUTTONTEXT] with Drupal Commerce "Add to cart" button
+ */
+
+/**
+ * Implementation of hook_filter_info().
+ */
+function commerce_atc_filter_filter_info() {
+  $filters['filter_commerce_atc_filter'] = array(
+    'title' => t('Add to cart buttons'),
+    'description' => t('Insert automatically add to cart buttons to Commerce products using [product-button:PRODUCTID title=BUTTONTEXT] tags.'),
+    'process callback' => 'commerce_atc_filter_filter_process',
+    'cache' => false,
+    'weight' => -20,
+  );
+
+  return $filters;
+}
+
+/**
+ * Filter process callback. Replace the [product-button] tags with Add to Cart
+ */
+function commerce_atc_filter_filter_process($text, $filter) {
+  // Prevent useless processing if there are no caption tags at all.
+  if (stristr($text, '[product-button') !== FALSE) {
+    $pattern = '/\[product-button:(\d+)([^\]]*)\]/i';
+    $text = preg_replace_callback($pattern, '_commerce_atc_filter_filter_replace', $text);
+  }
+  return $text;
+}
+
+/**
+ * Callback for preg_replace_callback() in caption_filter_process_filter().
+ */
+function _commerce_atc_filter_filter_replace($matches) {
+  $form = NULL;
+  $attributes = _commerce_atc_filter_filter_tag_attributes($matches[2]);
+  $product_id = array($matches[1]);
+  $products = commerce_product_load_multiple($product_id);
+
+  if (!empty($products)) {
+    $form_id = commerce_cart_add_to_cart_form_id($product_id);
+    $line_item = commerce_product_line_item_new(reset($products), 1, 0, array());
+    $line_item->data['context']['product_ids'] = array_keys($products);
+    $line_item->data['context']['add_to_cart_combine'] = TRUE;
+    $form = drupal_get_form($form_id, $line_item, FALSE);
+
+    if (!empty($attributes['title'])) {
+      $form['submit']['#value'] = check_plain($attributes['title']);
+    }
+
+    $form = '<div class="content-inline-addtocart">'. drupal_render($form) .'</div>';
+  }
+
+  return $form;
+}
+
+/**
+ * Retrieve all attributes
+ *
+ * @todo - this could be better but i'm bad with regex, help welcomed!
+ */
+function _commerce_atc_filter_filter_tag_attributes($text) {
+  $attributes = array();
+  if (!empty($text)) {
+    $attrs = explode(',', $text);
+    foreach ($attrs as $k => $v) {
+      $attr = explode('=', $v);
+      $attributes[trim($attr[0])] = $attr[1];
+    }
+  }
+  return $attributes;
+}

@@ -1,0 +1,13 @@
+diff --git a/commerce_atc_filter.module b/commerce_atc_filter.module
+index 2c1e8d8..36d0cb1 100644
+--- a/commerce_atc_filter.module
++++ b/commerce_atc_filter.module
+@@ -42,7 +42,7 @@ function _commerce_atc_filter_filter_replace($matches) {
+ 
+   if (!empty($products)) {
+     $form_id = commerce_cart_add_to_cart_form_id($product_id);
+-    $line_item = commerce_product_line_item_new(reset($products), 1, 0, array(), $type);
++    $line_item = commerce_product_line_item_new(reset($products), 1, 0, array());
+     $line_item->data['context']['product_ids'] = array_keys($products);
+     $line_item->data['context']['add_to_cart_combine'] = TRUE;
+     $form = drupal_get_form($form_id, $line_item, FALSE);

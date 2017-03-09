@@ -1,0 +1,6 @@
+; $Id$
+name = Cottage Hillstation
+package = Cottage Hillstation Custom Modules
+description = Cottage Custom functions.
+core = 7.x
+version 
