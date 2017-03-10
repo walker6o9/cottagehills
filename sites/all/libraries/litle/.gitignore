@@ -1,0 +1,11 @@
+*.tar
+.project
+
+.DS_Store
+/.buildpath
+reports/
+/vendor
+composer.lock
+/lib
+/litle_SDK_config.ini
+.idea/
