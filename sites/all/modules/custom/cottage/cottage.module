@@ -1,4 +1,8 @@
 <?php
+// Custom Module for Cottage Hill Station custom fucntions
+// Author :  Omar Zorrilla Llerena
+// emai   : omarzorrillallerena@gmail.com
+
 function cottage_node_postinsert($node){
 
   $type = $node->type;
