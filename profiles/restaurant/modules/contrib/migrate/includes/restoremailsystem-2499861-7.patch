@@ -1,0 +1,100 @@
+diff --git a/includes/base.inc b/includes/base.inc
+index 1c922e1..383f59a 100644
+--- a/includes/base.inc
++++ b/includes/base.inc
+@@ -304,7 +304,7 @@ abstract class MigrationBase {
+   /**
+    * An array to track 'mail_system' variable if disabled.
+    */
+-  protected $mailSystem = array();
++  protected $mailSystem;
+ 
+   /**
+    * Have we already warned about obsolete constructor argumentss on this request?
+@@ -437,12 +437,6 @@ abstract class MigrationBase {
+     // Record the time limit
+     $this->timeLimit = ini_get('max_execution_time');
+ 
+-    // Save the current mail system, prior to disabling emails.
+-    $this->saveMailSystem();
+-
+-    // Prevent emails from being sent out during migrations.
+-    $this->disableMailSystem();
+-
+     // Make sure we clear our semaphores in case of abrupt exit
+     drupal_register_shutdown_function(array($this, 'endProcess'));
+ 
+@@ -904,6 +898,12 @@ abstract class MigrationBase {
+     // Try to make the semaphore handling atomic (depends on DB support)
+     $transaction = db_transaction();
+ 
++    // Save the current mail system, prior to disabling emails.
++    $this->saveMailSystem();
++
++    // Prevent emails from being sent out during migrations.
++    $this->disableMailSystem();
++
+     $this->starttime = microtime(TRUE);
+ 
+     // Check to make sure there's no process already running for this migration
+@@ -960,6 +960,10 @@ abstract class MigrationBase {
+     }
+     if ($this->processing) {
+       $this->status = MigrationBase::STATUS_IDLE;
++
++      // Restore the previous mail handler.
++      $this->restoreMailSystem();
++
+       $fields = array('class_name' => get_class($this), 'status' => MigrationBase::STATUS_IDLE);
+       db_merge('migrate_status')
+         ->key(array('machine_name' => $this->machineName))
+@@ -1368,14 +1372,9 @@ abstract class MigrationBase {
+   /**
+    * Saves the current mail system, or set a system default if there is none.
+    */
+-  protected function saveMailSystem() {
++  public function saveMailSystem() {
+     global $conf;
+-    if (empty($conf['mail_system'])) {
+-      $conf['mail_system']['default-system'] = 'MigrateMailIgnore';
+-    }
+-    else {
+-      $this->mailSystem = $conf['mail_system'];
+-    }
++    $this->mailSystem = empty($conf['mail_system']) ? NULL : $conf['mail_system'];
+   }
+ 
+   /**
+@@ -1388,6 +1387,9 @@ abstract class MigrationBase {
+         $conf['mail_system'][$system] = 'MigrateMailIgnore';
+       }
+     }
++    else {
++      $conf['mail_system'] = array('default-system' => 'MigrateMailIgnore');
++    }
+   }
+ 
+   /**
+diff --git a/tests/plugins/destinations/node.test b/tests/plugins/destinations/node.test
+index 437e2ca..3fd4c35 100644
+--- a/tests/plugins/destinations/node.test
++++ b/tests/plugins/destinations/node.test
+@@ -392,5 +392,18 @@ class MigrateNodeUnitTest extends DrupalWebTestCase {
+     foreach ($result as $row) {
+       $this->error($row->message);
+     }
++
++    // Test proper disableMailSystem()/restoreMailSystem() behavior.
++    // @see https://www.drupal.org/node/2499861
++    // This is not necessarily node-related, but it was shoved in the node test.
++    $migration->saveMailSystem();
++    $migration->disableMailSystem();
++    $ms = variable_get('mail_system', NULL);
++    $this->assertTrue(is_array($ms) && in_array('MigrateMailIgnore', $ms),
++      t('Migration has disabled mail system'));
++    $migration->restoreMailSystem();
++    $ms = variable_get('mail_system', NULL);
++    $this->assertFalse(is_array($ms) && in_array('MigrateMailIgnore', $ms),
++      t('Migration::restoreMailSystem restored mail system'));
+   }
+ }

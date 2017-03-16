@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * @file
+ * Provides administration enhancements, based on Radix theme
+ */
+
+/**
+ * Implements hook_page_build().
+ */
+function radix_admin_page_build(&$page) {
+  $path = drupal_get_path('module', 'radix_admin');
+
+  // Load stylesheet.
+  $page['page_bottom']['radix_admin'] = array('#attached' => array());
+  $attached = &$page['page_bottom']['radix_admin']['#attached'];
+  $options = array('every_page' => TRUE);
+  $attached['css'][$path . '/css/radix_admin.css'] = $options;
+
+  // Load javascript.
+  $attached['js'][$path . '/js/radix_admin.js'] = $options;
+}
+
+/**
+ * Implements hook_navbar_items().
+ */
+function radix_admin_navbar_alter(&$items) {
+  // Show user tab on the far right.
+  $items['user']['#wrapper_attributes']['class'][] = 'pull-right';
+
+  // Add icons to tabs.
+  foreach ($items as $item_name => &$item) {
+    if ($icon = radix_admin_get_navbar_icon($item_name)) {
+      $item['tab']['#title'] = '<i class="fa ' . $icon . '"></i>' . $item['tab']['#title'];
+      $item['tab']['#options']['html'] = TRUE;
+    }
+  }
+
+  // Add icons to administration links.
+  $administration_items = element_children($items['administration']['tray']['navbar_administration']['administration_menu']);
+  foreach ($administration_items as $key) {
+    $menu_item = &$items['administration']['tray']['navbar_administration']['administration_menu'][$key];
+    $menu_item_name = _radix_admin_get_item_name_from_title($menu_item['#title']);
+    if ($icon = radix_admin_get_navbar_icon($menu_item_name)) {
+      $menu_item['#title'] = '<i class="fa ' . $icon . '"></i>' . $menu_item['#title'];
+      $menu_item['#localized_options']['html'] = TRUE;
+    }
+  }
+}
+
+/**
+ * Implements hook_navbar_icons().
+ */
+function radix_admin_navbar_icons() {
+  return array(
+    'home' => 'fa-home',
+    'administration' => 'fa-bars',
+    'user' => 'fa-user',
+    'shortcuts' => 'fa-bookmark',
+    'content' => 'fa-file-text-o',
+    'structure' => 'fa-sitemap',
+    'appearance' => 'fa-tint',
+    'people' => 'fa-users',
+    'modules' => 'fa-level-up',
+    'configuration' => 'fa-cog',
+    'reports' => 'fa-copy',
+  );
+}
+
+/**
+ * Returns an icon for a menu item.
+ *
+ * @param $menu_item_name
+ *  The name of the menu item.
+ */
+function radix_admin_get_navbar_icon($menu_item_name) {
+  $icons = _radix_admin_get_navbar_icons();
+  return isset($icons[$menu_item_name]) ? $icons[$menu_item_name] : 'fa-angle-right';
+}
+
+/**
+ * Get icons for menu items.
+ */
+function _radix_admin_get_navbar_icons() {
+  // Get navbar icons from all modules that implement hook_navbar_icons().
+  $icons = module_invoke_all('navbar_icons');
+  return $icons;
+}
+
+/**
+ * Returns item name from menu item title.
+ *
+ * @param $title
+ *  The menu item title. 
+ */
+function _radix_admin_get_item_name_from_title($title) {
+  // Use drupal_clean_css_identifier for now.
+  return drupal_clean_css_identifier(drupal_strtolower($title));
+}
