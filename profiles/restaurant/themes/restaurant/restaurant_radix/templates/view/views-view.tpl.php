@@ -30,7 +30,7 @@
 
   <?php if ($rows): ?>
     <div class="view__content">
-      <?php print $content; ?>
+      <?php /*print $content;*/print_r($content['output']['#markup']); ?>
     </div>
   <?php elseif ($empty): ?>
     <div class="view__empty">
