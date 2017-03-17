@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="//52.24.41.28/sitemap.xsl"?>
+<?xml-stylesheet type="text/xsl" href="///sitemap.xsl"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>http://52.24.41.28/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
-<url><loc>http://52.24.41.28/events</loc></url>
-<url><loc>http://52.24.41.28/events/calendar</loc></url>
-<url><loc>http://52.24.41.28/events/past</loc></url>
-<url><loc>http://52.24.41.28/home</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
-<url><loc>http://52.24.41.28/locations</loc></url>
-<url><loc>http://52.24.41.28/menus</loc></url>
-<url><loc>http://52.24.41.28/happy-hour-specials-events</loc><lastmod>2017-03-03T00:58Z</lastmod><changefreq>daily</changefreq></url>
-<url><loc>http://52.24.41.28/content/coming-soon</loc><lastmod>2017-03-03T01:01Z</lastmod><changefreq>daily</changefreq></url>
-<url><loc>http://52.24.41.28/content/local-news-and-press</loc><lastmod>2017-03-03T01:00Z</lastmod><changefreq>daily</changefreq></url>
-<url><loc>http://52.24.41.28/content/cottage-hill-blog</loc><lastmod>2017-03-03T01:00Z</lastmod><changefreq>daily</changefreq></url>
+<url><loc>http:///</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+<url><loc>http:///events</loc></url>
+<url><loc>http:///events/calendar</loc></url>
+<url><loc>http:///events/past</loc></url>
+<url><loc>http:///home</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
+<url><loc>http:///locations</loc></url>
+<url><loc>http:///menus</loc></url>
+<url><loc>http:///happy-hour-specials-events</loc><lastmod>2017-03-03T00:58Z</lastmod><changefreq>monthly</changefreq></url>
+<url><loc>http:///content/coming-soon</loc><lastmod>2017-03-03T01:01Z</lastmod><changefreq>monthly</changefreq></url>
+<url><loc>http:///content/local-news-and-press</loc><lastmod>2017-03-03T01:00Z</lastmod><changefreq>monthly</changefreq></url>
+<url><loc>http:///content/cottage-hill-blog</loc><lastmod>2017-03-03T01:00Z</lastmod><changefreq>monthly</changefreq></url>
 </urlset>

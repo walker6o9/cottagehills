@@ -10107,9 +10107,7 @@ ul.footer-nav {
     margin-top: 25px;
 }
 
-#shopping_cart_pane.panel-pane.pane-block.pane-commerce-cart-cart{
-    float: right;
-    width: 25%;
-    margin-left: 5%;
-    margin-right: 5%;
+
+#messages a {
+    color: red;
 }
