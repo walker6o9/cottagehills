@@ -3,7 +3,7 @@
 // Author :  Omar Zorrilla Llerena
 // emai   : omarzorrillallerena@gmail.com
 
-function cottage_node_postinsert($node){
+function cottage_node_postsave/*insert*/($node){
 
   $type = $node->type;
 
@@ -65,4 +65,45 @@ function cottage_node_postinsert($node){
         
       }
  
+}
+
+function cottage_commerce_cart_product_add($order, $product, $quantity, $line_item){
+}
+
+
+
+function cottage_commerce_line_item_type_info_alter(&$line_item_types) {
+  $line_item_types['product']['callbacks'] = array('title' => '_cottage_commerce_product_line_item_title');
+}
+
+/**
+* Returns an appropriate title for this line item for this site
+*/
+function _cottage_commerce_product_line_item_title($line_item) {
+       $query = db_select('field_data_commerce_product', 'n')
+        ->fields('n', array('commerce_product_product_id'))
+        ->condition('entity_id', $line_item->line_item_id,'=');
+        $result = $query->execute();
+        $var = $result->fetchField();
+  
+       $query = db_select('field_data_field_menu_variants', 'n')
+        ->fields('n', array('entity_id'))
+        ->condition('field_menu_variants_product_id', $var,'=');
+        $result = $query->execute();
+        $product_id = $result->fetchField();
+
+       $query = db_select('node', 'n')
+        ->fields('n', array('title'))
+        ->condition('nid', $product_id,'=');
+        $result = $query->execute();
+        $product_name = $result->fetchField();
+        
+ if ($product = entity_metadata_wrapper('commerce_line_item', $line_item)->commerce_product->value()) {
+  if (isset($line_item->data['alt_title'])){
+    return check_plain($line_item->data['alt_title']);
+  }else{
+    $alt_title = $product_name . ': ' ;//isset($line_item->data['svbtitle']) ? $line_item->data['svbtitle'] : '';
+    return $alt_title . check_plain($product->title);
+  }
+ }
 }
