@@ -10111,3 +10111,15 @@ ul.footer-nav {
 #messages a {
     color: red;
 }
+
+.option-button-wrapper{
+    float: left;
+}
+/*new grid for all menus*/
+.grid-price{
+	float:right !important;
+}
+.grid-description{
+	float:left !important;
+}
+/*new grid for all menus end*/

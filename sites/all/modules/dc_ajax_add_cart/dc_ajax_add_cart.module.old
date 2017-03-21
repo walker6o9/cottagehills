@@ -31,7 +31,9 @@ define('DC_AJAX_ADD_CART_POPUP_PRODUCT_TOTAL_DISPLAY', 'dc_ajax_add_cart_popup_p
 define('DC_AJAX_ADD_CART_POPUP_PRODUCT_TOTAL_LABEL', 'dc_ajax_add_cart_popup_product_total_label');
 define('DC_AJAX_ADD_CART_POPUP_CHECKOUT', 'dc_ajax_add_cart_popup_checkout');
 define('DC_AJAX_ADD_CART_POPUP_CONTINUE_SHOPPING', 'dc_ajax_add_cart_popup_continue_shopping');
-
+     /*************** Hacked code ************************/
+$product_name = array();
+     /*************** Hacked code ************************/
 /**
  * Implements hook_permission().
  */
@@ -470,11 +472,11 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
     $shipping = array();
 
     $product_price_total = commerce_currency_format($variables['total']['amount'], $currency['code']);
-
+	$i=0;
     // Create the line item list and products array.
     foreach ($variables['line_items'] as $line_item_wrapper) {
       $line_item = $line_item_wrapper->value();
-
+      //dpm($line_item);
       // If the line item is a product.
       if (property_exists($line_item, 'commerce_product')) {
         $product = commerce_product_load($line_item->commerce_product[LANGUAGE_NONE][0]['product_id']);
@@ -501,8 +503,11 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
         ->fields('n', array('title'))
         ->condition('nid', $product_id,'=');
         $result = $query->execute();
-        $product->title = '<b><i>'.$result->fetchField() . ':</i></b> '. $product->title;
-        //dsm($product_name);
+        //$product->title = '<b>'.$result->fetchField() . ':</b> '. $product->title;
+        global $product_name; 
+        $product_name[$i] = '<b>'.$result->fetchField() . ':</b> '. $product->title;
+		$i++;
+        dsm($product_name);
      /*************** Hacked code ************************/
     
       // If line item is shipping service.
@@ -602,10 +607,28 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
         $variables['products_list']['row_classes'][$line_item->line_item_id] = 'ajax-cart-row';
       }
     }
-
+global $product_name;
     // Create new theme variables.
-    $variables['line_item_list'] = $line_item_list;
-    $variables['products'] = $products;
+    dpm($product_name);
+	$variables['line_item_list'] = $line_item_list;
+    //$variables['products'] = $products;
+  dpm($products);
+      /*************** Hacked code ************************/
+ //global $product_name;
+ for($i = 0; $i == sizeof($product_name);$i++){
+ try{
+ $products[0]->title = $product_name[$i];
+ 	} catch ( Exception $e ) {
+		echo "Caught exception: ", $e->getMessage (), "\n";
+	}
+ 
+  }
+  dpm($products);
+ $variables['products'] = $products;
+
+ 
+      /*************** Hacked code ************************/
+    
     $variables['product_prices'] = $product_prices;
     $variables['product_price_total'] = $product_price_total;
     $variables['checkout_url'] = l($variables['checkout_link']['text'], $variables['checkout_link']['path'], array(
