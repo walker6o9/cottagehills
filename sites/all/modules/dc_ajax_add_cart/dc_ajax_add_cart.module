@@ -501,7 +501,7 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
         ->fields('n', array('title'))
         ->condition('nid', $product_id,'=');
         $result = $query->execute();
-        $product->title = '<b><i>'.$result->fetchField() . ':</i></b> '. $product->title;
+        $product->title = '<b>'.$result->fetchField() . ':</b> '. $product->title;
         //dsm($product_name);
      /*************** Hacked code ************************/
     
@@ -682,7 +682,7 @@ function template_preprocess_dc_ajax_add_to_cart_message(&$variables) {
   $variables['configuration']['popup_continue_shopping'] = check_plain(variable_get(DC_AJAX_ADD_CART_POPUP_CONTINUE_SHOPPING, t('Continue shopping')));
   $variables['configuration']['popup_product_name_display'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_NAME_DISPLAY, 1);
   $variables['configuration']['popup_product_name_label'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_NAME_LABEL, 'no_display_label');
-  $variables['product_name'] = check_plain($variables['product']->title);
+  $variables['product_name'] = check_plain(strip_tags($variables['product']->title));
   $variables['configuration']['popup_product_price_display'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_PRICE_DISPLAY, 1);
   $variables['configuration']['popup_product_price_label'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_PRICE_LABEL, 'display_label');
   $variables['configuration']['popup_product_quantity_display'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_QUANTITY_DISPLAY, 1);
