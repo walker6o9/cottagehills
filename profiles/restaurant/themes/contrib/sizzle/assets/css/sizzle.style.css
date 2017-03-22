@@ -2851,6 +2851,7 @@ fieldset[disabled] a {
   pointer-events: none; }
 
 .btn-default {
+  margin-bottom: 10%;/*grid hack*/
   color: #333;
   background-color: #fff;
   border-color: #ccc; }
@@ -10075,14 +10076,14 @@ ul.footer-nav {
 .pane-mailchimp-signup-join .pane-content label{
     display:none;
 }
-
-.pane-mailchimp-signup-join .pane-content #edit-mergevars-email{
-    float: left;
-    width: 30%;
-    margin-left: 5%;
-    margin-right: 5%;
+@media (min-width: 768px) {
+    .pane-mailchimp-signup-join .pane-content #edit-mergevars-email {
+        float: left;
+        width: 30%;
+        margin-left: 5%;
+        margin-right: 5%;
+    }
 }
-
 .pane-mailchimp-signup-join .pane-content #edit-submit{
     padding:6px 20px;
 }
@@ -10107,6 +10108,10 @@ ul.footer-nav {
     margin-top: 25px;
 }
 
+.pane-block-1 .pane-title{
+    margin-top: 20px;
+    text-align: center;
+}
 
 #messages a {
     color: red;
@@ -10115,11 +10120,70 @@ ul.footer-nav {
 .option-button-wrapper{
     float: left;
 }
+
+.pane-blog-featured-posts .views-field-title h4{
+    font-size:18px;
+}
+
+
+.mobile-only{
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-only{
+        display: inline;
+    }
+}
+
+.online-buttons{
+    padding: 2px 6px 2px 6px;
+    border-top: 1px solid #CCCCCC;
+    border-right: 1px solid #333333;
+    border-bottom: 1px solid #333333;
+    border-left: 1px solid #CCCCCC;
+    border-radius: 5px;
+    margin-top: 10px;
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.layout--location--node .pane-node-field-location-address .pane-content{
+    text-align: center;
+}
+
+.panels-ipe-portlet-marker .node--location .row .col-sm-6:first-child{
+    display: none;
+}
+/*.ajax-shopping-cart-wrapper {
+  float:right !important;
+  width:370px;
+}*/
+.ajax-shopping-cart-wrapper {
+  float:right !important;
+  width:100% !important;
+}
+.ribbon {
+  position: relative !important;
+}
+
 /*new grid for all menus*/
+.grid-title{
+	font-size:1.2em;
+	margin-bottom: -10% !important;
+	padding-bottom: -1em;
+}
 .grid-price{
 	float:right !important;
+	font-size:1.2em;
+    font-weight:400;
 }
 .grid-description{
 	float:left !important;
+	box-sizing:border-box !important;
+	width: 70% !important;
+	margin-bottom: 10% !important;
+	min-height: 115px !important;
+
 }
 /*new grid for all menus end*/
