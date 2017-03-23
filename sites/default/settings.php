@@ -249,7 +249,7 @@ $databases = array (
   array (
     'default' => 
     array (
-      'database' => 'cottagedev',
+      'database' => 'cottagelive',//dev',
       'username' => 'cottage',
       'password' => '5iaGNy4RXryLsQzl',
       'host' => 'cottage.c8ev03tuhhye.us-west-2.rds.amazonaws.com',
