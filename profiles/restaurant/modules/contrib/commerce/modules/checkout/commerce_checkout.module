@@ -370,7 +370,7 @@ function commerce_checkout_commerce_checkout_page_info() {
 
   // Define a page for reviewing the data entered during checkout.
   $checkout_pages['review'] = array(
-    'name' => t('Review'),
+    'name' => t('Enter Checkout Information'),
     'title' => t('Review order'),
     'help' => t('Review your order before continuing.'),
     'weight' => 10,
@@ -1009,7 +1009,7 @@ function commerce_checkout_completion_message_default() {
   }
   else {
     // Otherwise select a fallback format and use a plain text default value.
-    $value = 'Your order number is [commerce-order:order-number]. You can view your order on your account page when logged in.';
+    $value = 'Your order number is [commerce-order:order-number]. You will receive a confirmation email shortly. You can view your order on your account page when logged in.';
     $format = filter_fallback_format();
   }
 
