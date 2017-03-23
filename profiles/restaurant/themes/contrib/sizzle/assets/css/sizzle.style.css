@@ -10189,3 +10189,11 @@ ul.footer-nav {
 .option-button-wrapper{
     float: left;
 }
+
+.page-checkout #commerce-checkout-form-review .view-id-commerce_cart_summary {
+    display: none;
+}
+
+.checkout-continue.form-submit.btn.btn-default.checkout-processed .button-operator{
+    display: none;
+}

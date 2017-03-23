@@ -370,7 +370,7 @@ function commerce_checkout_commerce_checkout_page_info() {
 
   // Define a page for reviewing the data entered during checkout.
   $checkout_pages['review'] = array(
-    'name' => t('Review'),
+    'name' => t('Enter Checkout Information'),
     'title' => t('Review order'),
     'help' => t('Review your order before continuing.'),
     'weight' => 10,
