@@ -10182,8 +10182,10 @@ ul.footer-nav {
 	float:left !important;
 	box-sizing:border-box !important;
 	width: 70% !important;
-	margin-bottom: 10% !important;
-	min-height: 115px !important;
 
 }
 /*new grid for all menus end*/
+
+.option-button-wrapper{
+    float: left;
+}
