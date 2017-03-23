@@ -9082,12 +9082,11 @@ ul.dropdown-menu li {
         margin-left: -25%; }
 
 .ribbon {
-  position: absolute;
+    position: relative;
   top: -5px;
   left: 0;
   color: white;
-  padding: 5px 8px;
-  z-index: 200; }
+  padding: 5px 8px; }
   .ribbon:before {
     content: "";
     bottom: -10px;
@@ -10163,9 +10162,7 @@ ul.footer-nav {
   float:right !important;
   width:100% !important;
 }
-.ribbon {
-  position: relative !important;
-}
+
 
 /*new grid for all menus*/
 .grid-title{
@@ -10181,7 +10178,7 @@ ul.footer-nav {
 .grid-description{
 	float:left !important;
 	box-sizing:border-box !important;
-	width: 70% !important;
+    margin-bottom: 10px;
 
 }
 /*new grid for all menus end*/
@@ -10196,4 +10193,12 @@ ul.footer-nav {
 
 .checkout-continue.form-submit.btn.btn-default.checkout-processed .button-operator{
     display: none;
+}
+
+.view-display-id-all_menus h4{
+    display: inline;
+}
+
+.commerce-add-to-cart{
+    text-align: center;
 }

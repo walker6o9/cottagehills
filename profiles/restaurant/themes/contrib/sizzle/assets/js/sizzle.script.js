@@ -96,6 +96,8 @@
 
 
 // A $( document ).ready() block.
-jQuery( document ).ready(function($) {
-    $('#edit-mergevars-email').attr('placeholder', 'Enter Email Address');
+jQuery( document ).ready(function() {
+    jQuery('#edit-mergevars-email').attr('placeholder', 'Enter Email Address');
+
+
 });

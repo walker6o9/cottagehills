@@ -41,7 +41,7 @@
  *   label.
  */
 ?>
-<div class="add-to-cart-overlay" id="add-to-cart-overlay"></div>
+<div class="add-to-cart-overlay" id="add-to-cart-overlay" data-dismiss="add-cart-message"></div>
 <div class="add-cart-message-wrapper">
   <a class="add-to-cart-close" data-dismiss="add-cart-message">
     <span class="element-invisible"><?php print t('Close'); ?></span>
