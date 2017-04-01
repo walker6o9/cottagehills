@@ -141,7 +141,7 @@
           {
               ArrayOfSides = ArrayOfSides.concat(temp[i]);
           }
-          ArrayOfSides.push('<?php echo html_entity_decode("<b>".explode(":",$product_name)[0].": </b>".explode(":",$product_name)[1]);?>"+"<br><b>Side: </b>'+ this.options[this.selectedIndex].text);
+          ArrayOfSides.push('<?php echo /*html_entity_decode(*/"<b>".explode(":",$product_name)[0].": </b>".htmlspecialchars(explode(":",$product_name)[1])/*)*/;?>"+"<br><b>Side: </b>'+ this.options[this.selectedIndex].text);
           updatedString = JSON.stringify(ArrayOfSides).replace(/'/g, "\\'");//replace(/('[a-zA-Z0-9\s]+\s*)'(\s*[a-zA-Z0-9\s]+')/g,"$1\\\'$2");
 		  document.cookie =  "productname = " + encodeURI(updatedString);
           
