@@ -3,6 +3,8 @@
 // Author :  Omar Zorrilla Llerena
 // emai   : omarzorrillallerena@gmail.com
 
+
+//THIS FUNCTION ADD AN (ADD TO CART BUTTON TO EACH NODE AFTER BEING CREATED)
 function cottage_node_postinsert($node){
 
   $type = $node->type;
@@ -71,7 +73,7 @@ function cottage_commerce_cart_product_add($order, $product, $quantity, $line_it
 }
 
 
-
+//THIS 2 FUNCTIONS BELOW ADD PRODUCT TYPE TO EACH PRODUCT AT THE BEGGINING OF THE PRODUCT NAME
 function cottage_commerce_line_item_type_info_alter(&$line_item_types) {
   $line_item_types['product']['callbacks'] = array('title' => '_cottage_commerce_product_line_item_title');
 }
@@ -97,13 +99,33 @@ function _cottage_commerce_product_line_item_title($line_item) {
         ->condition('nid', $product_id,'=');
         $result = $query->execute();
         $product_name = $result->fetchField();
-        
+
  if ($product = entity_metadata_wrapper('commerce_line_item', $line_item)->commerce_product->value()) {
   if (isset($line_item->data['alt_title'])){
     return check_plain($line_item->data['alt_title']);
   }else{
-    $alt_title = $product_name . ': ' ;//isset($line_item->data['svbtitle']) ? $line_item->data['svbtitle'] : '';
-    return $alt_title . check_plain($product->title);
+    $alt_title = $product_name;
+          if (isset($_COOKIE['productname'])){
+          $Pname = $_COOKIE['productname'];
+          $Pname= urldecode($Pname);
+          $pname = array();
+          $pname = json_decode($Pname);
+          
+
+    foreach($pname as $i => $item) {
+      if($i+1<count($pname)){
+        !empty(explode("<br><b>Side: </b>",$pname[$i+1])[1])?$side = explode("<br><b>Side: </b>",$pname[$i+1])[1]:$side="";
+         
+        if (strpos($pname[$i+1], $alt_title) !== false) {
+              if(count($side)>0) { 
+                $ptitle = $pname[$i+1];
+                return $ptitle;
+              }
+        }
+      }
+    }
+    return '<b>'.$alt_title  . ':</b> '. $product->title;// . "  <br>".$side;//$y ;
   }
  }
+}
 }

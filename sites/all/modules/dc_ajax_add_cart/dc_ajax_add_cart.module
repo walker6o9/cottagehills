@@ -31,7 +31,9 @@ define('DC_AJAX_ADD_CART_POPUP_PRODUCT_TOTAL_DISPLAY', 'dc_ajax_add_cart_popup_p
 define('DC_AJAX_ADD_CART_POPUP_PRODUCT_TOTAL_LABEL', 'dc_ajax_add_cart_popup_product_total_label');
 define('DC_AJAX_ADD_CART_POPUP_CHECKOUT', 'dc_ajax_add_cart_popup_checkout');
 define('DC_AJAX_ADD_CART_POPUP_CONTINUE_SHOPPING', 'dc_ajax_add_cart_popup_continue_shopping');
+define('DC_AJAX_ADD_CART_POPUP_PRODUCT_SIDES', 'dc_ajax_add_cart_popup_product_sides');
 
+$pid = array(0 => "test");
 /**
  * Implements hook_permission().
  */
@@ -105,6 +107,7 @@ function dc_ajax_add_cart_menu() {
   return $items;
 }
 
+
 /**
  * Menu callback: Removes the product item from cart.
  *
@@ -128,9 +131,47 @@ function dc_ajax_add_cart_remove_commerce_line_item($ajax, $line_item_id) {
   // Check whether this is AJAX callback.
   $is_ajax = $ajax === 'ajax';
 
+
+  
+   /*************** Hacked code ************************/
+  $query = db_select('commerce_line_item', 'n')
+        ->fields('n', array('line_item_label'))
+        ->condition('line_item_id', $line_item_id,'=');
+        $result = $query->execute();
+        $var = $result->fetchField();
+  $query = db_select('commerce_product', 'n')
+        ->fields('n', array('title'))
+        ->condition('sku', $var,'=');
+        $result = $query->execute();
+        $product_mid_name = $result->fetchField();
+       if (isset($_COOKIE['productname']) and isset($_COOKIE['lid'])){
+          $Pname = $_COOKIE['productname'];
+          $Pname= urldecode($Pname);
+          $pname = array();
+          $pname = json_decode($Pname);
+          
+          $Lid = $_COOKIE['lid'];
+          $Lid= urldecode($Lid);
+          $lid = array();
+          $lid = json_decode($Lid);
+          foreach($pname as $i => $item) {
+              $b=explode(":",$pname[$i])[1];
+              if (strpos($b, $product_mid_name) !== false){
+                unset($pname[$i]);
+                unset($lid[$i]);
+                $pname = array_values($pname);
+                $lid = array_values($lid);
+                $json = json_encode($pname);
+                setcookie("productname", $json, 0, '/');
+                $json = json_encode($lid);
+                setcookie("lid", $json, 0, '/');                
+              }
+          }
+  }
+      /*************** Hacked code ************************/
   // Delete the product line item from cart.
   commerce_cart_order_product_line_item_delete($order, $line_item_id);
-
+  
   // Get the current status of cart and other information.
   $commerce_cart = dc_ajax_add_cart_get_commerce_cart_details();
   $line_items = $commerce_cart['wrapper']->commerce_line_items;
@@ -470,7 +511,7 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
     $shipping = array();
 
     $product_price_total = commerce_currency_format($variables['total']['amount'], $currency['code']);
-
+    $i=1;
     // Create the line item list and products array.
     foreach ($variables['line_items'] as $line_item_wrapper) {
       $line_item = $line_item_wrapper->value();
@@ -501,10 +542,32 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
         ->fields('n', array('title'))
         ->condition('nid', $product_id,'=');
         $result = $query->execute();
-        $product->title = '<b>'.$result->fetchField() . ':</b> '. $product->title;
-        //dsm($product_name);
+        $alt_title = $result->fetchField();
+        
+        if (isset($_COOKIE['productname']) and isset($_COOKIE['lid'])){
+          $Pname = $_COOKIE['productname'];
+          $Pname= urldecode($Pname);
+          $pname = array();
+          $pname = json_decode($Pname);
+          
+          $Lid = $_COOKIE['lid'];
+          $Lid= urldecode($Lid);
+          $lid = array();
+          $lid = json_decode($Lid);
+          //if($i>= count($lid))$lid[$i]="";
+          if($line_item->line_item_label == $lid[$i]){
+
+            $product->title = $pname[$i];
+            $i++;
+            
+          }else{
+            $product->title = '<b>'.$alt_title  . ':</b> '. $product->title ;
+          }
+        }else{
+           $product->title = '<b>'.$alt_title  . ':</b> '. $product->title ;
+        }
      /*************** Hacked code ************************/
-    
+        
       // If line item is shipping service.
       }elseif (property_exists($line_item, 'commerce_shipping_service')) {
         $shipping['service'] = $line_item->line_item_label;
@@ -669,12 +732,13 @@ function template_preprocess_dc_ajax_shopping_cart_teaser(&$variables) {
 function template_preprocess_dc_ajax_add_to_cart_message(&$variables) {
   // Default currency array.
   $currency = commerce_currency_load(commerce_default_currency());
-
   $product_price = commerce_product_calculate_sell_price($variables['product']);
 
   $variables['product_per_unit_price'] = commerce_currency_format($product_price['amount'], $currency['code']);
   $variables['product_price_total'] = commerce_currency_format($variables['quantity'] * $product_price['amount'], $currency['code']);
-
+   global $pid;
+   $pid = _dc_ajax_add_cart_get_sides($variables['product']->product_id);
+  //dpm("this is the pid:".$pid);
   // Create new theme variables related to configuration.
   $variables['configuration']['success_message'] = check_plain(variable_get(DC_AJAX_ADD_CART_SUCCESS_MESSAGE, t('Item successfully added to cart')));
   $variables['configuration']['popup_checkout'] = check_plain(variable_get(DC_AJAX_ADD_CART_POPUP_CHECKOUT, t('Go to checkout')));
@@ -689,7 +753,32 @@ function template_preprocess_dc_ajax_add_to_cart_message(&$variables) {
   $variables['configuration']['popup_product_quantity_label'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_QUANTITY_LABEL, 'display_label');
   $variables['configuration']['popup_product_total_display'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_TOTAL_DISPLAY, 1);
   $variables['configuration']['popup_product_total_label'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_TOTAL_LABEL, 'display_label');
+  $variables['configuration']['popup_select_sides'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_SIDES, $pid);
 }
+
+function _dc_ajax_add_cart_get_sides($var){
+
+        $query = db_select('field_data_field_menu_variants', 'n')
+        ->fields('n', array('entity_id'))
+        ->condition('field_menu_variants_product_id', $var,'=');
+        $result = $query->execute();
+        $product_id = $result->fetchField();
+        $query = db_select('field_data_field_list_of_sides', 'n')
+        ->fields('n', array('field_list_of_sides_value'))
+        ->condition('entity_id', $product_id,'=');
+        $result = $query->execute();
+        $sides = $result->fetchField();
+        $sides = explode("\n", $sides);
+        foreach ($sides as $key => $value) {
+          if (empty($value)) {
+             unset($sides[$key]);
+          }
+        }
+          if (!empty($sides)) {
+             return $sides;
+          }
+}
+
 
 /**
  * Rebuild add to cart form.
