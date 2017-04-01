@@ -141,8 +141,9 @@
           {
               ArrayOfSides = ArrayOfSides.concat(temp[i]);
           }
-          ArrayOfSides.push("<? echo html_entity_decode("<b>".explode(":",$product_name)[0].": </b>".explode(":",$product_name)[1]);?>"+"<br><b>Side: </b>"+ this.options[this.selectedIndex].text);
-          document.cookie =  "productname = " + JSON.stringify(ArrayOfSides);
+          ArrayOfSides.push('<?php echo html_entity_decode("<b>".explode(":",$product_name)[0].": </b>".explode(":",$product_name)[1]);?>"+"<br><b>Side: </b>'+ this.options[this.selectedIndex].text);
+          updatedString = JSON.stringify(ArrayOfSides).replace(/'/g, "\\'");//replace(/('[a-zA-Z0-9\s]+\s*)'(\s*[a-zA-Z0-9\s]+')/g,"$1\\\'$2");
+		  document.cookie =  "productname = " + encodeURI(updatedString);
           
           y = String(readCookie('lid'));
           //alert("this is x before:"+x);
@@ -159,7 +160,7 @@
           
           //document.cookie =  "side = <b>Side: </b>"+ this.options[this.selectedIndex].text;
 
-          document.cookie =  "lid = " + JSON.stringify(ArrayOfLids);
+          document.cookie =  "lid = " + encodeURI(JSON.stringify(ArrayOfLids));
           //alert("this is the lid:"+"<?php echo $line_item_id;?>");
     } 
     </script>
@@ -167,6 +168,7 @@
        $aol=false;
        if (isset($_COOKIE['productname'])){
           $Pname = $_COOKIE['productname'];
+          $Pname= urldecode($Pname);
           $pname = array();
           $pname = json_decode($Pname);
           
