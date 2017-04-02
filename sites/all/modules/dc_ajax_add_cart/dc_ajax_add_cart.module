@@ -557,8 +557,8 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
           //if($i>= count($lid))$lid[$i]="";
           if($line_item->line_item_label == $lid[$i]){
 
-            $product->title = $pname[$i];
-            $i++;
+            $product->title = trim($pname[$i]);
+            if($i<count($pname))$i++;
             
           }else{
             $product->title = '<b>'.$alt_title  . ':</b> '. $product->title ;

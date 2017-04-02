@@ -124,7 +124,7 @@
       var t = document.getElementById("ajax-shopping-cart-table"), // This have to be the ID of the table, not the tag
           d = t.getElementsByTagName("tr")[t.getElementsByTagName("tr").length-1];//['ajax-cart-row'],
           r = d.getElementsByTagName("td")['name'].innerHTML;
-          d.getElementsByTagName("td")['name'].innerHTML= " "+ "<? echo explode("<br>", $product->title)[0]; ?>" +"<br><b>Side: </b>"+ this.options[this.selectedIndex].text;
+          d.getElementsByTagName("td")['name'].innerHTML= " "+ "<? /*dsm($product->title);echo explode("<br>",*/ $product->title/*)[0]*/; ?>" +"<br><b>Side: </b>"+ this.options[this.selectedIndex].text;
       var ArrayOfSides = new Array();
       var ArrayOfLids = new Array();
       var temp =  new Array();
@@ -141,7 +141,7 @@
           {
               ArrayOfSides = ArrayOfSides.concat(temp[i]);
           }
-          ArrayOfSides.push('<?php echo /*html_entity_decode(*/"<b>".explode(":",$product_name)[0].": </b>".htmlspecialchars(explode(":",$product_name)[1])/*)*/;?>"+"<br><b>Side: </b>'+ this.options[this.selectedIndex].text);
+          ArrayOfSides.push('<?php echo html_entity_decode("<b>".explode(":",$product_name)[0].": </b>".explode(":",$product_name)[1]);?>'+'<br><b>Side: </b>'+ this.options[this.selectedIndex].text);
           updatedString = JSON.stringify(ArrayOfSides).replace(/'/g, "\\'");//replace(/('[a-zA-Z0-9\s]+\s*)'(\s*[a-zA-Z0-9\s]+')/g,"$1\\\'$2");
 		  document.cookie =  "productname = " + encodeURI(updatedString);
           
