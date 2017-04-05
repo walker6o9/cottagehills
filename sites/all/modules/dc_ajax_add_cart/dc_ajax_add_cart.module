@@ -171,7 +171,7 @@ function dc_ajax_add_cart_remove_commerce_line_item($ajax, $line_item_id) {
       /*************** Hacked code ************************/
   // Delete the product line item from cart.
   commerce_cart_order_product_line_item_delete($order, $line_item_id);
-  
+
   // Get the current status of cart and other information.
   $commerce_cart = dc_ajax_add_cart_get_commerce_cart_details();
   $line_items = $commerce_cart['wrapper']->commerce_line_items;
@@ -187,12 +187,53 @@ function dc_ajax_add_cart_remove_commerce_line_item($ajax, $line_item_id) {
       $content_cart = '';
     }
     else {
+      
+      /*******************  ADDED *************************/
+       $i=1;
+       $product = commerce_product_load($line_item->commerce_product[LANGUAGE_NONE][0]['product_id']);
+       foreach ($line_item_list as $line_item) {
+       if (isset($_COOKIE['productname']) and isset($_COOKIE['lid'])){
+          $Pname = $_COOKIE['productname'];
+          $Pname= urldecode($Pname);
+          $pname = array();
+          $pname = json_decode($Pname);
+          
+          $Lid = $_COOKIE['lid'];
+          $Lid= urldecode($Lid);
+          $lid = array();
+          $lid = json_decode($Lid);
+         if($line_item->line_item_label == $lid[$i]){
+            global $current_side;
+            $product->title = $product->title. "<br><b>Side: </b>". $current_side;//trim($pname[$i]);
+            $side_updated = db_update('commerce_line_item') // Table name no longer needs {}
+              ->fields(array(
+                'side' => explode("<br><b>Side: </b>",$pname[$i])[1],
+              ))
+              ->condition('line_item_id',  $car_li_id, '=')
+              ->execute();
+            if($i<count($pname))$i++;
+            
+          }else{
+            $product->title = '<b>'.$alt_title  . ':</b> '. $product->title ;
+          }
+        }else{
+           $product->title = '<b>'.$alt_title  . ':</b> '. $product->title ;
+        }
+      
+	  //$product->text = $product->text . TEST;
+	  //$product->save();
+	  //$line_items->save();
+	  }
+      /******************** END ADDED **********************/
+      
+      
       $content_cart = theme('dc_ajax_shopping_cart', array(
         'order' => $commerce_cart['order'],
         'line_items' => $line_items,
         'quantity' => $quantity,
         'total' => $total,
       ));
+      //dsm($order); // HERE WE HAVE TO MODIFY THE LINE ITEMS TO HAVE THE PRODUCT TITLE
     }
     $commands[] = dc_ajax_add_cart_command_html('div.ajax-shopping-cart-wrapper', $content_cart);
 
@@ -213,6 +254,7 @@ function dc_ajax_add_cart_remove_commerce_line_item($ajax, $line_item_id) {
     drupal_set_message(t('Product removed from cart'));
     drupal_goto();
   }
+  
 }
 
 /**
@@ -558,6 +600,15 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
           if($line_item->line_item_label == $lid[$i]){
 
             $product->title = trim($pname[$i]);
+           
+            $side_updated = db_update('commerce_line_item') // Table name no longer needs {}
+  				->fields(array(
+    			'side' => explode("<br><b>Side: </b>",$pname[$i])[1],
+  				))
+  				->condition('line_item_id',  $car_li_id, '=')
+  				->execute();
+
+
             if($i<count($pname))$i++;
             
           }else{
@@ -938,3 +989,13 @@ function dc_ajax_add_cart_command_html($selector, $html) {
     'data' => $html,
   );
 }
+
+/*function dc_ajax_add_cart_commerce_checkout_complete($order){
+      $wrapper = entity_metadata_wrapper('commerce_order', $order);
+  foreach ($wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+  $line_item = $line_item_wrapper->value();
+ $product = commerce_product_load($line_item->commerce_product[LANGUAGE_NONE][0]['product_id']);
+$product->title = explode(":",$product->title)[0]."<br>".explode("<br>",$product->title)[1];
+	dsm($product->title); 
+  }
+}*/
