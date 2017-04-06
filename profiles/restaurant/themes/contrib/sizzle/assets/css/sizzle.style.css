@@ -2214,7 +2214,7 @@ table th[class*="col-"] {
         .table-responsive > .table > tbody > tr > td,
         .table-responsive > .table > tfoot > tr > th,
         .table-responsive > .table > tfoot > tr > td {
-          white-space: nowrap; }
+           }
       .table-responsive > .table-bordered, .calendar-calendar .table-responsive > table.mini {
         border: 0; }
         .table-responsive > .table-bordered > thead > tr > th:first-child, .calendar-calendar .table-responsive > table.mini > thead > tr > th:first-child,
@@ -10191,7 +10191,7 @@ ul.footer-nav {
     display: none;
 }
 
-.checkout-continue.form-submit.btn.btn-default.checkout-processed .button-operator{
+.checkout-buttons .button-operator{
     display: none;
 }
 
@@ -10201,4 +10201,56 @@ ul.footer-nav {
 
 .commerce-add-to-cart{
     text-align: center;
+}
+
+.view-image{
+    float: left;
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+}
+
+.view-image img{
+
+    width: 70%;
+    max-width: 100%;
+    height: auto;
+}
+
+.alert-success.alert-dismissable{
+    display: none;
+
+}
+@media (max-width: 768px) {
+    .add-cart-message-wrapper {
+        left: 2%;
+        right: 2%;
+    }
+
+    .sides-name select{
+        max-width:75%;
+    }
+    .new-item-details{
+        float: none;
+    }
+}
+
+.view--menus--all-menus .term img, .view--menus--all-menus .node img{
+    display: none;
+}
+
+.views-field.views-field-php .view-image{
+    margin-bottom: 10px;
+}
+
+.sides-name select{
+    max-width:75%;
+}
+
+.checkout-help{
+    display: none;
+}
+
+.checkout-review.table .pane-title:first-of-type{
+    display: none;
 }
