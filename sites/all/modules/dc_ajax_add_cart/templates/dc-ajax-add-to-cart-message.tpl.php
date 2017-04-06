@@ -64,51 +64,6 @@
       //dsm($line_item_id);
     ?>
     <script>
-    /*function look_for_side(args) {
-    
-    //var resp = ['Fresh Baked Pretzels: w/ queso & spicy mustard','Giardiniera Hummus: Fresh Hummus w/ Veggies topped w/ Hot pepper blend']
-
-    $('#name').each(function() {
-    if( resp.indexOf($(this).text()) != -1 ){
-        //$(this).closest('tr').addClass('del');
-         return resp.indexOf($(this).text());
-    }else{
-      return null;
-    }
-    });
-    }  
-    
-    function GetCellValues(tbl) {
-        var table = document.getElementById(tbl);
-        for (var r = 0, n = table.rows.length; r < n; r++) {
-            for (var c = 0, m = table.rows[r].cells.length; c < m; c++) {
-                alert(table.rows[r].cells[c].innerHTML);
-            }
-        }
-    }
-    
- function getSide(ter,col){
-  var term = ter;                   // term you're searching for
-  var column = col;                            // which column to search
-  var pattern = new RegExp(term, 'g');       // make search more flexible 
-  var table = document.getElementById('ajax-shopping-cart-table');
-  var tr = table.getElementsByTagName('tr');
-  for(var i = 0; i < tr.length; i++){
-    var td = tr[i].getElementsByTagName('td');
-    for(var j = 0; j < td.length; j++){
-      if(j == column && td[j].innerHTML.includes(term)){
-        return true;
-      // for more flexibility use match() function and the pattern built above
-      // if(j == column && td[j].innerHTML.match(pattern)){
-
-        console.log('Found it: ' + td[j].innerHTML);
-      }
-    }    
-  }
-  return false;
-};*/
-    
-    
     function readCookie(name) {
     var nameEQ = name + "=";
     var ca = document.cookie.split(';');
@@ -176,7 +131,7 @@
           foreach($pname as $i => $item) {
                   $a=explode(":",$pname[$i+1])[0];
                   $b=explode(":",$product_name)[0];
-                  if (strpos($a, $b) !== false) {
+                  if (strpos($a, $b) !== false) {//Here problem when removed and added again
                     $aol= true;
                   }
           }

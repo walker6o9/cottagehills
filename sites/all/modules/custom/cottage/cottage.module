@@ -129,10 +129,3 @@ function _cottage_commerce_product_line_item_title($line_item) {
  }
 }
 }
-
-function cottage_commerce_checkout_complete(){
-                 $json="";
-                 setcookie("productname", $json, 0, '/');
-                 setcookie("lid", $json, 0, '/');                
-  
-}

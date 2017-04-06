@@ -168,7 +168,7 @@ function dc_ajax_add_cart_remove_commerce_line_item($ajax, $line_item_id) {
               }
           }
   }
-      /*************** Hacked code ************************/
+      /*************** End Hacked code ************************/
   // Delete the product line item from cart.
   commerce_cart_order_product_line_item_delete($order, $line_item_id);
 
@@ -189,40 +189,13 @@ function dc_ajax_add_cart_remove_commerce_line_item($ajax, $line_item_id) {
     else {
       
       /*******************  ADDED *************************/
-       $i=1;
-       $product = commerce_product_load($line_item->commerce_product[LANGUAGE_NONE][0]['product_id']);
-       foreach ($line_item_list as $line_item) {
-       if (isset($_COOKIE['productname']) and isset($_COOKIE['lid'])){
-          $Pname = $_COOKIE['productname'];
-          $Pname= urldecode($Pname);
-          $pname = array();
-          $pname = json_decode($Pname);
-          
-          $Lid = $_COOKIE['lid'];
-          $Lid= urldecode($Lid);
-          $lid = array();
-          $lid = json_decode($Lid);
-         if($line_item->line_item_label == $lid[$i]){
-            global $current_side;
-            $product->title = $product->title. "<br><b>Side: </b>". $current_side;//trim($pname[$i]);
-            $side_updated = db_update('commerce_line_item') // Table name no longer needs {}
-              ->fields(array(
-                'side' => explode("<br><b>Side: </b>",$pname[$i])[1],
-              ))
-              ->condition('line_item_id',  $car_li_id, '=')
-              ->execute();
-            if($i<count($pname))$i++;
-            
-          }else{
-            $product->title = '<b>'.$alt_title  . ':</b> '. $product->title ;
+       $j=1;
+       foreach ($line_items as $line_item) {
+       $product = entity_metadata_wrapper('commerce_line_item', $line_item)->commerce_product->value();//commerce_product_load($line_item->commerce_product[LANGUAGE_NONE][0]['product_id']);
+          if(/*$line_item->line_item_label*/$product->sku == $lid[$j]){
+            $product->title = /*$product->title. "<br><b>Side: </b>". $current_side;*/trim(explode($product->title,$pname[$j])[1]);
+            if($j<count($pname))$j++;
           }
-        }else{
-           $product->title = '<b>'.$alt_title  . ':</b> '. $product->title ;
-        }
-      
-	  //$product->text = $product->text . TEST;
-	  //$product->save();
-	  //$line_items->save();
 	  }
       /******************** END ADDED **********************/
       
@@ -990,12 +963,9 @@ function dc_ajax_add_cart_command_html($selector, $html) {
   );
 }
 
-/*function dc_ajax_add_cart_commerce_checkout_complete($order){
-      $wrapper = entity_metadata_wrapper('commerce_order', $order);
-  foreach ($wrapper->commerce_line_items as $delta => $line_item_wrapper) {
-  $line_item = $line_item_wrapper->value();
- $product = commerce_product_load($line_item->commerce_product[LANGUAGE_NONE][0]['product_id']);
-$product->title = explode(":",$product->title)[0]."<br>".explode("<br>",$product->title)[1];
-	dsm($product->title); 
-  }
-}*/
+function dc_ajax_add_cart_commerce_checkout_complete(){
+                 $json="";
+                 setcookie("productname", $json, 0, '/');
+                 setcookie("lid", $json, 0, '/');                
+  
+}
