@@ -150,7 +150,7 @@ function add_sides(event) {
       d = t.getElementsByTagName("tr")[t.getElementsByTagName("tr").length-1];//['ajax-cart-row'],
       r = d.getElementsByTagName("td")['name'].innerHTML;
   var    pname = "<? echo explode(":",$product->title)[0]; ?>";
-  var    pmiddle = "<? echo explode(":",$product->title)[1]; ?>";
+  var    pmiddle = "<? $premiddle = explode(":",$product->title)[1]; echo "</b>".strip_tags(explode("1", $premiddle )[0]); ?>"
   var temp= new Array();
   var tempside="";
   //other_sides=getSides("<? echo $configuration['order_id']; ?>"); 
@@ -170,7 +170,7 @@ function add_sides(event) {
            for(var i = 0; i < temp.length; i++)
            
            {
-              tempside = tempside + "<br>"+ (i+1) +")"+temp[i];+ "<br>";
+              tempside = tempside + "<br>"+ (i+1) +")"+ /*decodeURIComponent(*/temp[i]/*)*/;//+ "<br>";
               //alert("TEMPSIDE inside Xarray:"+tempside);
                             //alert("TEMPSIDE lenght:"+tempside);
 
@@ -184,11 +184,13 @@ function add_sides(event) {
   
 
       var  pside = tempside +"<br>"+ (i+1) +")"+this.options[this.selectedIndex].text;//"<br>"+tempside + "<br>"+this.options[this.selectedIndex].text;
-      d.getElementsByTagName("td")['name'].innerHTML= " "+ pname + pmiddle + /*"<br><b>Side: </b>" +*/"<br>"+ pside;
+      d.getElementsByTagName("td")['name'].innerHTML= " "+ pname + pmiddle + /*"<br><b>Side: </b>" +"<br>"+ */pside;
+     // d.getElementsByTagName("td")['name'].innerHTML= /*" "+ pname + pmiddle + /*"<br><b>Side: </b>" +"<br>"+ */pside;
+
       temp = temp.concat(this.options[this.selectedIndex].text);
 
       //temp.push(this.options[this.selectedIndex].text);
-      updatedString =  JSON.stringify(temp).replace(/'/g, "\\'");//temp.join("<br>");//
+      updatedString =  JSON.stringify(/*encodeURIComponent(*/temp/*)*/);//.replace(/'/g, "\\'");//temp.join("<br>");//
       //console.log(updatedString.replace(/['"]+/g, ''));
       updatedString=updatedString.replace(/[\])}[{(]/g, '');
       updatedString = "["+updatedString+"]";
