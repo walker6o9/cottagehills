@@ -2,10 +2,10 @@
 $erl = error_reporting(E_ALL);
 
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "cottagehills";
+$servername = "cottage.c8ev03tuhhye.us-west-2.rds.amazonaws.com";
+$username = "cottage";
+$password = "5iaGNy4RXryLsQzl";
+$dbname = "cottagelive";
 
 
 if(!empty($_POST)){
