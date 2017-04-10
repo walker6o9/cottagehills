@@ -5,6 +5,8 @@
 
 
 //THIS FUNCTION ADD AN (ADD TO CART BUTTON TO EACH NODE AFTER BEING CREATED)
+$order_condition=0;
+
 function cottage_node_postinsert($node){
 
   $type = $node->type;
@@ -69,8 +71,6 @@ function cottage_node_postinsert($node){
  
 }
 
-function cottage_commerce_cart_product_add($order, $product, $quantity, $line_item){
-}
 
 
 //THIS 2 FUNCTIONS BELOW ADD PRODUCT TYPE TO EACH PRODUCT AT THE BEGGINING OF THE PRODUCT NAME
@@ -103,29 +103,91 @@ function _cottage_commerce_product_line_item_title($line_item) {
  if ($product = entity_metadata_wrapper('commerce_line_item', $line_item)->commerce_product->value()) {
   if (isset($line_item->data['alt_title'])){
     return check_plain($line_item->data['alt_title']);
-  }else{
+}else{
     $alt_title = $product_name;
-          if (isset($_COOKIE['productname'])){
-          $Pname = $_COOKIE['productname'];
-          $Pname= urldecode($Pname);
-          $pname = array();
-          $pname = json_decode($Pname);
-          
 
-    foreach($pname as $i => $item) {
-      if($i+1<count($pname)){
-        !empty(explode("<br><b>Side: </b>",$pname[$i+1])[1])?$side = explode("<br><b>Side: </b>",$pname[$i+1])[1]:$side="";
-         
-        if (strpos($pname[$i+1], $alt_title) !== false) {
-              if(count($side)>0) { 
-                $ptitle = $pname[$i+1];
-                return $ptitle;
-              }
-        }
-      }
-    }
-    return '<b>'.$alt_title  . ':</b> '. $product->title;// . "  <br>".$side;//$y ;
-  }
+ global $user;
+$uid = $user->uid;  
+$order_id = commerce_cart_order_id($uid);
+  $pname = array();
+          $pname = _cottage_get_saved_sides_per_order($order_id);
+ 
+          $lid = array();
+          $lid = _cottage_get_saved_skus_per_order($order_id);//json_decode($Lid);
+ for($i=0; $i< sizeof($pname); $i++) {
+          if($line_item->line_item_label==$lid[$i]){
+            $pname_side=array();
+            
+            $pname_side= json_decode(/*utf8_encode(*/$pname[$i]/*)*/,true);
+            if(!empty($pname_side)){//explode("<br>",$pname[$i]);
+            
+                    $temp="";
+                    foreach ($pname_side as $key => $value) {
+                        $temp = $temp  . "<br>".((int)$key+1).")". /*rawurldecode(*/$pname_side[$key]/*)*/;//. "<br>";
+                    }
+                    $product->title = '<b>'.$alt_title  . ':</b> '. $product->title . $temp;/*."<br><b>Side: </b>"*///.$pname[$i];
+      
+            if($i<count($pname))$i++;
+            }else{
+               $product->title = '<b>'.$alt_title  . ':</b> '. $product->title ;
+            }
+          }else{
+            $product->title = '<b>'.$alt_title  . ':</b> '. $product->title ;
+          }
+}
+      return  $product->title;// . "  <br>".$side;//$y ;
+
  }
 }
+}
+
+function _cottage_get_saved_sides_per_order($order_id){
+        $query = db_select('commerce_line_item', 'n')
+        ->fields('n', array('side'))
+        ->condition('order_id', $order_id,'=')
+        ->isNotNull('side');
+        
+        $result = $query->execute();
+        $sides_in_order = $result->fetchAllAssoc('side',PDO::FETCH_ASSOC);
+        
+        if (is_array($sides_in_order) || is_object($sides_in_order))
+        {
+        foreach ($sides_in_order as $key => $value) {
+          if (empty($value)) {
+             unset($sides_in_order[$key]);
+          }
+        }
+        }
+        $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($sides_in_order));
+        $list = iterator_to_array($it,false);
+        
+        if (!empty($list)){
+             return $list;
+          }
+
+}
+
+function _cottage_get_saved_skus_per_order($order_id){
+        $query = db_select('commerce_line_item', 'n')
+        ->fields('n', array('line_item_label'))
+        ->condition('order_id', $order_id,'=')
+        ->isNotNull('side');
+        
+        $result = $query->execute();
+        $sides_in_order = $result->fetchAllAssoc('line_item_label',PDO::FETCH_ASSOC);
+        if (is_array($sides_in_order) || is_object($sides_in_order))
+        {
+        foreach ($sides_in_order as $key => $value) {
+          if (empty($value)) {
+             unset($sides_in_order[$key]);
+          }
+        }
+        }
+        $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($sides_in_order));
+        $list = iterator_to_array($it,false);
+        
+        if (!empty($list)){
+             return $list;
+          }
+          
 }
