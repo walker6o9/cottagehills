@@ -58,92 +58,155 @@
       </div>
     <?php endif;
      if(!empty($configuration['popup_select_sides'])){
-      //dsm($line_item_id);
     ?>
     <script>
-    function readCookie(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0;i < ca.length;i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+/*********************************/
+
+var other_sides='';
+/*********************************/
+
+function getSides(line_item_id,callback){
+  var sides;
+        if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest();
+        } else {
+            // code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+               // sides = this.responseText;
+                //alert("Este es el side");
+                //alert(this.responseText);
+                callback(this.responseText); 
+            }else{
+              //alert(this.readyState);
+              // alert(this.status);
+            }
+        };
+        xmlhttp.open("GET","sites/all/modules/dc_ajax_add_cart/dc_ajax_add_cart.php?q="+line_item_id,false);
+        xmlhttp.send();
+  }
+
+/*********************************/
+
+function JSON_flatten(data) {
+    var result = {};
+    function recurse (cur, prop) {
+        if (Object(cur) !== cur) {
+            result[prop] = cur;
+        } else if (Array.isArray(cur)) {
+             for(var i=0, l=cur.length; i<l; i++)
+                 recurse(cur[i], prop + "[" + i + "]");
+            if (l == 0)
+                result[prop] = [];
+        } else {
+            var isEmpty = true;
+            for (var p in cur) {
+                isEmpty = false;
+                recurse(cur[p], prop ? prop+"."+p : p);
+            }
+            if (isEmpty && prop)
+                result[prop] = {};
+        }
     }
-    return null;
-}   
-    function add_sides(event) {
-      var x,y;
-      var t = document.getElementById("ajax-shopping-cart-table"), // This have to be the ID of the table, not the tag
-          d = t.getElementsByTagName("tr")[t.getElementsByTagName("tr").length-1];//['ajax-cart-row'],
-          r = d.getElementsByTagName("td")['name'].innerHTML;
-          d.getElementsByTagName("td")['name'].innerHTML= " "+ "<? echo /*explode("<br>",*/ $product->title/*)[0]*/; ?>" +"<br><b>Side: </b>"+ this.options[this.selectedIndex].text;
-      var ArrayOfSides = new Array();
-      var ArrayOfLids = new Array();
-      var temp =  new Array();
-      var temp1 =  new Array();
-          
-          x = String(readCookie('productname'));
-          //alert("this is x before:"+x);
-          x=decodeURI(x);
-          //alert("this is x after:"+x);
-          var Xarray = new Array();
-          Xarray = JSON.parse(x);
-          temp = Array(Xarray);
-          for(var i = 0; i < temp.length; i++)
-          {
-              ArrayOfSides = ArrayOfSides.concat(temp[i]);
-          }
-          ArrayOfSides.push('<?php echo html_entity_decode("<b>".explode(":",$product_name)[0].": </b>".explode(":",$product_name)[1]);?>'+'<br><b>Side: </b>'+ this.options[this.selectedIndex].text);
-          updatedString = JSON.stringify(ArrayOfSides).replace(/'/g, "\\'");//replace(/('[a-zA-Z0-9\s]+\s*)'(\s*[a-zA-Z0-9\s]+')/g,"$1\\\'$2");
-		  document.cookie =  "productname = " + encodeURI(updatedString);
-          
-          y = String(readCookie('lid'));
-          //alert("this is x before:"+x);
-          y=decodeURI(y);
-          //alert("this is x after:"+x);
-          var Yarray = new Array();
-          Yarray = JSON.parse(y);
-          temp = Array(Yarray);
-          for(var i = 0; i < temp.length; i++)
-          {
-              ArrayOfLids = ArrayOfLids.concat(temp[i]);
-          }
-          ArrayOfLids.push("<?php echo $line_item->line_item_label;?>");
-          
-          //document.cookie =  "side = <b>Side: </b>"+ this.options[this.selectedIndex].text;
+    recurse(data, "");
+    return result;
+}
 
-          document.cookie =  "lid = " + encodeURI(JSON.stringify(ArrayOfLids));
-          //alert("this is the lid:"+"<?php echo $line_item_id;?>");
-    } 
+/*********************************/
+
+function saveSides(str1,str2,str3) {
+var http = new XMLHttpRequest();
+var url = "sites/all/modules/dc_ajax_add_cart/dc_ajax_add_cart.php";
+var lid =  "<?php echo($configuration['led']);?>";//"<?php echo $line_item->line_item_id;?>";
+var params = "name="+str1+"&middle="+str2+"&sides="+str3+"&lid="+lid;
+http.open("POST", url, true);
+
+//Send the proper header information along with the request
+http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+http.onreadystatechange = function() {//Call a function when the state changes.
+    if(http.readyState == 4 && http.status == 200) {
+    }
+}
+http.send(params);
+}
+
+/*********************************/
+function asignar(callbak) {
+  other_sides= callbak; 
+ //alert('THIS IS OTHER SIDES'+other_sides);
+}
+
+/*********************************/
+
+
+function add_sides(event) {
+  var led="<? echo $configuration['led']; ?>";
+  var x,y;
+  var t = document.getElementById("ajax-shopping-cart-table"), // This have to be the ID of the table, not the tag
+      d = t.getElementsByTagName("tr")[t.getElementsByTagName("tr").length-1];//['ajax-cart-row'],
+      r = d.getElementsByTagName("td")['name'].innerHTML;
+  var    pname = "<? echo explode(":",$product->title)[0]; ?>";
+  var    pmiddle = "<? echo explode(":",$product->title)[1]; ?>";
+  var temp= new Array();
+  var tempside="";
+  //other_sides=getSides("<? echo $configuration['order_id']; ?>"); 
+  //alert(led);
+  
+  getSides(led,asignar); 
+  //other_sides=asignar();
+
+  if (typeof other_sides === 'undefined') {tempside="";
+  }else{
+  var Xarray = new Array();
+          //alert('THIS IS OTHER SIDES INSIDE XARRAY'+other_sides);
+          try {
+           temp =  JSON.parse(/*JSON_flatten(*/other_sides/*)*/);//other_sides.split("<br>");//
+           //temp = Array(Xarray);
+           
+           for(var i = 0; i < temp.length; i++)
+           
+           {
+              tempside = tempside + "<br>"+ (i+1) +")"+temp[i];+ "<br>";
+              //alert("TEMPSIDE inside Xarray:"+tempside);
+                            //alert("TEMPSIDE lenght:"+tempside);
+
+
+           }
+          } catch(e) {
+            //alert(e);
+            tempside=''; i=0;
+          } 
+  }
+  
+
+      var  pside = tempside +"<br>"+ (i+1) +")"+this.options[this.selectedIndex].text;//"<br>"+tempside + "<br>"+this.options[this.selectedIndex].text;
+      d.getElementsByTagName("td")['name'].innerHTML= " "+ pname + pmiddle + /*"<br><b>Side: </b>" +*/"<br>"+ pside;
+      temp = temp.concat(this.options[this.selectedIndex].text);
+
+      //temp.push(this.options[this.selectedIndex].text);
+      updatedString =  JSON.stringify(temp).replace(/'/g, "\\'");//temp.join("<br>");//
+      //console.log(updatedString.replace(/['"]+/g, ''));
+      updatedString=updatedString.replace(/[\])}[{(]/g, '');
+      updatedString = "["+updatedString+"]";
+      saveSides(""+pname,""+pmiddle, updatedString);
+  }
+/*********************************/
+
+
     </script>
-    <?php
-       $aol=false;
-       if (isset($_COOKIE['productname'])){
-          $Pname = $_COOKIE['productname'];
-          $Pname= urldecode($Pname);
-          $pname = array();
-          $pname = json_decode($Pname);
-          
-      
-          foreach($pname as $i => $item) {
-                  $a=explode(":",$pname[$i+1])[0];
-                  $b=explode(":",$product_name)[0];
-                  if (strpos($a, $b) !== false) {//Here problem when removed and added again
-                    $aol= true;
-                  }
-          }
-       }
-
-    if(!$aol){ ?>
       <div class="sides-name">
 		<select onchange="add_sides.call(this, event)">
                   <option value="">-- Please Select a Side --</option>
                   <?php
                   foreach($configuration['popup_select_sides']  as $key => $value):
                   if($configuration['popup_select_sides'] == 0){
-                    echo '<option value="'.$key.'" selected="selected">'.$value.'</option>'; 
+                    echo '<option value="'.$key.'" selected="selected">'.$value.'</option>';
                   }else{
-                    echo '<option value="'.$key.'">'.$value.'</option>'; 
+                    echo '<option value="'.$key.'">'.$value.'</option>';
                   }
                   endforeach;
                   ?>
@@ -153,7 +216,7 @@
         <div class="option-button checkout"><?php print $checkout_link; ?></div>
         <div class="option-button continue" data-dismiss="add-cart-message"><?php print $configuration['popup_continue_shopping']; ?></div>
       </div>
-    <?php  } }
+    <?php  }// }
       if ($configuration['popup_product_price_display'] == 1) : ?>
       <div class="product-cost-incl-tax">
         <?php if ($configuration['popup_product_price_label'] == 'display_label') : ?>
