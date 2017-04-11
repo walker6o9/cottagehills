@@ -255,7 +255,7 @@ function dc_ajax_add_cart_ajax_cart_form(&$form, &$form_state) {
       $last_line_item_product = commerce_product_load($form_state['values']['product_id']);
       $last_line_item_quantity = $form_state['values']['quantity'];
       $led=$last_line_item->line_item_id;
-      dsm($led);
+      //dsm($led);
       
       $content = theme('dc_ajax_add_to_cart_message', array(
         'line_item' => $last_line_item,
@@ -511,6 +511,12 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
         $alt_title = $result->fetchField();
         $order_condition=$variables['order']->order_id;
 
+       $query = db_select('commerce_line_item', 'n')
+        ->fields('n', array('middle'))
+        ->condition('line_item_id', $line_item->line_item,'=');
+        $result = $query->execute();
+        $middle = $result->fetchField();
+        
           $pname = array();
           $pname = _dc_ajax_add_cart_get_saved_sides_per_order($order_condition);
           //json_decode($Pname);
@@ -528,7 +534,7 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
                     foreach ($pname_side as $key => $value) {
                         $temp = $temp  . "<br>".((int)$key+1).")". /*rawurldecode(*/$pname_side[$key]/*)*/;//. "<br>";
                     }
-                    $product->title = '<b>'.$alt_title  . ':</b> '. $product->title . $temp;/*."<br><b>Side: </b>"*///.$pname[$i];
+                    $product->title = '<b>'.$alt_title  . ':</b> '. 'fixed midtext'/*$middle /*explode("1)",explode("</b>",$product->title)[0]/*)[0]*/ . $temp;/*."<br><b>Side: </b>"*///.$pname[$i];
       
             if($i<count($pname))$i++;
             }else{

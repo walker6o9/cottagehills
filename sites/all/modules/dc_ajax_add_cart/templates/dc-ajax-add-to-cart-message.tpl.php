@@ -54,7 +54,7 @@
         <?php if ($configuration['popup_product_name_label'] == 'display_label') : ?>
           <p class="name-label"><?php print t('Name:'); ?></p>
         <?php endif; ?>
-        <p class="name"><?php print $product_name; ?></p>
+        <p class="name"><?php print explode(":",$product_name)[0]; ?></p>
       </div>
     <?php endif;
      if(!empty($configuration['popup_select_sides'])){
@@ -150,7 +150,15 @@ function add_sides(event) {
       d = t.getElementsByTagName("tr")[t.getElementsByTagName("tr").length-1];//['ajax-cart-row'],
       r = d.getElementsByTagName("td")['name'].innerHTML;
   var    pname = "<? echo explode(":",$product->title)[0]; ?>";
-  var    pmiddle = "<? $premiddle = explode(":",$product->title)[1]; echo "</b>".strip_tags(explode("1", $premiddle )[0]); ?>"
+  //var    pmiddle = "<? $premiddle = explode(":",$product->title)[1]; echo "</b>".strip_tags(explode("1", $premiddle )[0]); ?>"
+  var    premiddle = /*"caperucito rojo: el caperucito estaba en el bosque <br> cuando de pronto";*/"<? echo $product->title; ?>";
+  alert("<? echo $product->title; ?>");
+  alert(premiddle);
+  var pmid = Array(); pmid = premiddle.split(":");
+  	  alert(pmid[1]);
+  	  pmid2 = Array();pmid2 = pmid[1].split("<br>");
+  	  pmiddle=pmid2[0];
+  	  alert(pmid2[0])	
   var temp= new Array();
   var tempside="";
   //other_sides=getSides("<? echo $configuration['order_id']; ?>"); 
@@ -184,7 +192,7 @@ function add_sides(event) {
   
 
       var  pside = tempside +"<br>"+ (i+1) +")"+this.options[this.selectedIndex].text;//"<br>"+tempside + "<br>"+this.options[this.selectedIndex].text;
-      d.getElementsByTagName("td")['name'].innerHTML= " "+ pname + pmiddle + /*"<br><b>Side: </b>" +"<br>"+ */pside;
+      d.getElementsByTagName("td")['name'].innerHTML= " "+ pname+":" + pmiddle + /*"<br><b>Side: </b>" +"<br>"+ */pside;
      // d.getElementsByTagName("td")['name'].innerHTML= /*" "+ pname + pmiddle + /*"<br><b>Side: </b>" +"<br>"+ */pside;
 
       temp = temp.concat(this.options[this.selectedIndex].text);
