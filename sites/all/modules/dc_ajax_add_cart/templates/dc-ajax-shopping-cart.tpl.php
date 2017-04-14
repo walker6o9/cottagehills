@@ -68,7 +68,7 @@
       <div id="ajax-shopping-cart-shipping"><?php print $shipping['service'] . ' ' . $shipping['price']; ?></div>
     <?php endif; ?>
     <div id="ajax-shopping-cart-total"><?php print t('Total:') . ' ' . $product_price_total; ?></div>
-    <div id="ajax-shopping-cart-checkout"><?php $checkout_url="<a href='https://cottagehillstation.com/checkout'>Checkout</a>";print $checkout_url; ?></div>
+    <div id="ajax-shopping-cart-checkout"><?php $checkout_url="<a href='checkout'>Checkout</a>";print $checkout_url; ?></div>
   </div>
 <?php elseif ($quantity == 0 || !$order) : ?>
   <div id="empty-shopping-cart"><?php print $configuration['empty_cart_message']; ?></div>
