@@ -123,7 +123,7 @@ $order_id = commerce_cart_order_id($uid);
             
                     $temp="";
                     foreach ($pname_side as $key => $value) {
-                        $temp = $temp  . "<br>".((int)$key+1).")". /*rawurldecode(*/$pname_side[$key]/*)*/;//. "<br>";
+                        $temp = $temp  . "<br>".((int)$key+1).")". rawurldecode($pname_side[$key]);//. "<br>";
                     }
                     $product->title = '<b>'.$alt_title  . ':</b> '. $product->title . $temp;/*."<br><b>Side: </b>"*///.$pname[$i];
       

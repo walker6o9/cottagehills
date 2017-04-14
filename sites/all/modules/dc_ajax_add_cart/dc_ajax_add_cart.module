@@ -513,7 +513,7 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
 
        $query = db_select('commerce_line_item', 'n')
         ->fields('n', array('middle'))
-        ->condition('line_item_id', $line_item->line_item,'=');
+        ->condition('line_item_id', $led/*$line_item->line_item*/,'=');
         $result = $query->execute();
         $middle = $result->fetchField();
         
@@ -532,9 +532,9 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
             
                     $temp="";
                     foreach ($pname_side as $key => $value) {
-                        $temp = $temp  . "<br>".((int)$key+1).")". /*rawurldecode(*/$pname_side[$key]/*)*/;//. "<br>";
+                        $temp = $temp  . "<br>".((int)$key+1).")". rawurldecode($pname_side[$key]);//. "<br>";
                     }
-                    $product->title = '<b>'.$alt_title  . ':</b> '. 'fixed midtext'/*$middle /*explode("1)",explode("</b>",$product->title)[0]/*)[0]*/ . $temp;/*."<br><b>Side: </b>"*///.$pname[$i];
+                    $product->title = '<b>'.$alt_title  . ':</b> '. $middle /*explode("1)",explode("</b>",$product->title)[0]/*)[0]*/ . $temp;/*."<br><b>Side: </b>"*///.$pname[$i];
       
             if($i<count($pname))$i++;
             }else{
