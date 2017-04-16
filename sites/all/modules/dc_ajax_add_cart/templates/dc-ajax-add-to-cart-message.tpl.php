@@ -77,7 +77,6 @@ function getSides(line_item_id,callback){
         xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                // sides = this.responseText;
-                //alert("Este es el side");
                 //alert(this.responseText);
                 callback(this.responseText); 
             }else{
@@ -137,52 +136,49 @@ http.send(params);
 /*********************************/
 function asignar(callbak) {
   other_sides= callbak; 
- //alert('THIS IS OTHER SIDES'+other_sides);
 }
 
 /*********************************/
+function find_element(t,value) {
+
+$('#'+t+' td').each(function (i, el) {
+  if(this.innerHTML.includes(value)){
+  var txt = $(el).text();
+  //$(el).text(txt.replace(/(I\sam)\b/g, 'Me'));
+  alert($(el).index());
+  }
+});
+
+return $(el).index()
+}
+
+
 
 
 function add_sides(event) {
   var led="<? echo $configuration['led']; ?>";
   var x,y;
   var t = document.getElementById("ajax-shopping-cart-table"), // This have to be the ID of the table, not the tag
+      //indice = find_element("ajax-shopping-cart-table","Fresh Baked Pretzels"),
       d = t.getElementsByTagName("tr")[t.getElementsByTagName("tr").length-1];//['ajax-cart-row'],
+      //d = t.getElementsByTagName("tr")[indice],//['ajax-cart-row'],
       r = d.getElementsByTagName("td")['name'].innerHTML;
-  var    pname = "<? echo explode(":",$product->title)[0]; ?>";
-  //var    pmiddle = "<? $premiddle = explode(":",$product->title)[1]; echo "</b>".strip_tags(explode("1", $premiddle )[0]); ?>"
-  var    premiddle = /*"caperucito rojo: el caperucito estaba en el bosque <br> cuando de pronto";*/"<? echo $product->title; ?>";
-  //alert("<? echo $product->title; ?>");
-  //alert(premiddle);
-  var pmid = Array(); pmid = premiddle.split(":");
-  	  //alert(pmid[1]);
-  	  pmid2 = Array();pmid2 = pmid[1].split("<br>");
-  	  pmiddle=pmid2[0];
-  	  //alert(pmid2[0])	
+  var pname = "<? echo explode(":",$product->title)[0]; ?>";
+  var pmiddle = "</b>"+"<? echo  explode("1)",rawurldecode(end(explode(':',strip_tags($product->title)))))[0]; /*explode(":",explode(":",$product_name)[1])[1]; */?>";
   var temp= new Array();
   var tempside="";
-  //other_sides=getSides("<? echo $configuration['order_id']; ?>"); 
-  //alert(led);
   
   getSides(led,asignar); 
-  //other_sides=asignar();
-
   if (typeof other_sides === 'undefined') {tempside="";
   }else{
   var Xarray = new Array();
-          //alert('THIS IS OTHER SIDES INSIDE XARRAY'+other_sides);
           try {
            temp =  JSON.parse(/*JSON_flatten(*/other_sides/*)*/);//other_sides.split("<br>");//
-           //temp = Array(Xarray);
            
            for(var i = 0; i < temp.length; i++)
            
            {
-              tempside = tempside + "<br>"+ (i+1) +")"+ /*decodeURIComponent(*/decodeURIComponent(temp[i])/*)*/;//+ "<br>";
-              //alert("TEMPSIDE inside Xarray:"+tempside);
-                            //alert("TEMPSIDE lenght:"+tempside);
-
-
+              tempside = tempside + "<br>"+ (i+1) +")"+ decodeURIComponent(temp[i]);//+ "<br>";
            }
           } catch(e) {
             //alert(e);
@@ -192,17 +188,15 @@ function add_sides(event) {
   
 
       var  pside = tempside +"<br>"+ (i+1) +")"+this.options[this.selectedIndex].text;//"<br>"+tempside + "<br>"+this.options[this.selectedIndex].text;
-      d.getElementsByTagName("td")['name'].innerHTML= " "+ pname+":" + pmiddle + /*"<br><b>Side: </b>" +"<br>"+ */pside;
-     // d.getElementsByTagName("td")['name'].innerHTML= /*" "+ pname + pmiddle + /*"<br><b>Side: </b>" +"<br>"+ */pside;
-
-      temp = temp.concat(encodeURIComponent(this.options[this.selectedIndex].text));
-
-      //temp.push(this.options[this.selectedIndex].text);
+      d.getElementsByTagName("td")['name'].innerHTML= " "+ pname+":" + decodeURIComponent(pmiddle) + /*"<br><b>Side: </b>" +"<br>"+ */pside;
+      temp = temp.concat(this.options[this.selectedIndex].text);
       updatedString =  JSON.stringify(/*encodeURIComponent(*/temp/*)*/);//.replace(/'/g, "\\'");//temp.join("<br>");//
-      //console.log(updatedString.replace(/['"]+/g, ''));
-      updatedString=updatedString.replace(/[\])}[{(]/g, '').replace(/'/g, "\\'");
-      updatedString = "["+updatedString+"]";
-      saveSides(""+pname,""+pmiddle,(updatedString));
+      updatedString = encodeURIComponent(updatedString);
+      pname = encodeURIComponent(pname);
+      pmiddle = decodeURIComponent(pmiddle)
+      pmiddle = JSON.stringify(pmiddle);
+      pmiddle = /*encodeURIComponent*/escape(pmiddle);
+      saveSides(pname,pmiddle,updatedString);
   }
 /*********************************/
 

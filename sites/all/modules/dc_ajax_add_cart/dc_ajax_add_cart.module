@@ -515,8 +515,9 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
         ->fields('n', array('middle'))
         ->condition('line_item_id', $led/*$line_item->line_item*/,'=');
         $result = $query->execute();
-        $middle = $result->fetchField();
-        
+        $middle = json_decode(rawurldecode($result->fetchField()));
+        /*!empty($middle)?*/$mid=$middle;//$mid=$product->title;
+
           $pname = array();
           $pname = _dc_ajax_add_cart_get_saved_sides_per_order($order_condition);
           //json_decode($Pname);
@@ -534,9 +535,10 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
                     foreach ($pname_side as $key => $value) {
                         $temp = $temp  . "<br>".((int)$key+1).")". rawurldecode($pname_side[$key]);//. "<br>";
                     }
-                    $product->title = '<b>'.$alt_title  . ':</b> '. $middle /*explode("1)",explode("</b>",$product->title)[0]/*)[0]*/ . $temp;/*."<br><b>Side: </b>"*///.$pname[$i];
+                    
+                    $product->title = '<b>'.$alt_title  . ':</b> '. $mid/*explode("1)",explode("</b>",$product->title)[0]/*)[0]*/ . $temp;/*."<br><b>Side: </b>"*///.$pname[$i];
       
-            if($i<count($pname))$i++;
+                    if($i<count($pname))$i++;
             }else{
                $product->title = '<b>'.$alt_title  . ':</b> '. $product->title ;
             }
