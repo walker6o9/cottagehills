@@ -1,0 +1,11 @@
+package = Lightspeed
+name = Lightspeed Restaurant
+description = Provides a user interface for connecting to Lightspeed Restaurant .
+php = 5.0
+core = 7.x
+configure = admin/config/lightspeed
+dependencies[] = filter
+version = "7.x-1"
+core = "7.x"
+project = "lightspeed_restaurant"
+;datestamp = "1334082653"

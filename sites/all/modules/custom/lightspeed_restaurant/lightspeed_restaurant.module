@@ -1,0 +1,508 @@
+<?php
+error_reporting(E_ALL); 
+ini_set('display_errors','1');
+ 
+ /*$companyId=14431;
+ $deviceId="api";
+ $password="bK6Vre2QtGZdZ5q7";
+ $username="staging@stevekemph.com";*/
+ $DEBUG = 0;
+
+
+define("companyId", 14431);
+define("deviceId", "api");
+define("password", "bK6Vre2QtGZdZ5q7");
+define("username", "staging@stevekemph.com");
+
+//************************************************
+//********** GET TOKEN ***************************
+//************************************************
+function _lightspeed_restaurant_get_token(){
+global $DEBUG;
+//$DEBUG =0;
+$params = array("companyId"=>companyId,
+				"deviceId" =>deviceId,
+				"password" =>password,
+				"username" =>username
+				);
+
+//$data_string =   "companyId".trim($params[0])."&deviceId=".trim($params[1])."&password=".trim($params[2])."&username=".trim($params[3]);
+$data_string = json_encode($params);
+
+//GET TOKEN
+if($DEBUG==1)print_r($data_string);
+$uri = "http://staging-exact-integration.posios.com/PosServer/rest/token";
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL,$uri);
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS,$data_string);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+'Content-Type: application/json',
+'Accept: */*',
+'Content-Length: ' . strlen($data_string))
+); 
+$result = curl_exec($ch);
+//$result = json_decode($result, true);
+//Get Access Token on Successful Setup & Initialization of the User
+if($DEBUG==1)print_r($result);
+$result = json_decode($result,true);
+if($DEBUG==1)print_r($result);
+$access_token = $result['token'];
+if($DEBUG==1)echo("<br>ACCESS TOKEN:". $access_token);
+echo "<br><br>";
+curl_close($ch);
+return $access_token;
+}
+
+
+//************************************************
+//*********** CREATE CUSTOMER ********************
+//************************************************
+function _lightspeed_restaurant_create_customer($token){
+//global $companyId,$deviceId,$password,$username,$DEBUG;
+
+//$DEBUG =0;
+$params = array(/*
+  "city"=> "New York",
+  "companyId" => $companyId,
+  "country" => "USA",
+  "credits" => 0,
+  "customerCards" => array(    
+      "code"=> "",
+      "companyId"=> $companyId,
+      "creationUserId"=> 0,
+      "customerId"=> 0,
+      "expiryDate"=> 0,
+      "generatedDate"=> 0,
+      "lastUsedDate"=> 0,
+      "lastValueAddedDate"=> 0,
+      "originalValue"=> 0,
+      "remainingValue"=> 0,
+      "type"=> "string",
+      "uuid"=> "string"
+    ),
+  "deliveryCity"=> "New York",
+  "deliveryCountry"=> "USA",
+  "deliveryStreet"=> "73ST",
+  "deliveryStreetNumber"=> "234",
+  "deliveryZip"=> "1001",
+  "email"=> "ramsesiden@yahoo.com",
+  "firstName"=> "Omar",
+  "id"=> 0123456789,
+  "lastName"=> "Zorrilla",
+  "modificationTime"=> "string",
+  "note"=> "string",
+  "street"=> "string",
+  "streetNumber"=> "string",
+  "telephone"=> "01122334455",
+  "uuid"=> "string",
+  "vatNumber"=> "string",
+  "zip"=> "10001"
+);
+*/
+
+  "city"=> "New York",
+  "country"=> "USA",
+  "deliveryCity"=> "Manhatan",
+  "deliveryCountry"=> "USA",
+  "deliveryStreet"=> "11ST",
+  "deliveryStreetNumber"=> "2",
+  "deliveryZip"=> "10001",
+  "email"=> "ramsesiden@test14.com",
+  "firstName"=> "test1",
+  "lastName"=> "testlast1",
+  "street"=> "Eleven street",
+  "streetNumber"=> "3",
+  "telephone"=> "123456789",
+  "zip"=> "10001"
+);
+
+//$data_string =   "companyId".trim($params[0])."&deviceId=".trim($params[1])."&password=".trim($params[2])."&username=".trim($params[3]);
+$data_string = json_encode($params);
+
+//CREATE CUSTOMER
+if($DEBUG==1)print_r($data_string);
+$uri = "http://staging-exact-integration.posios.com/PosServer/rest/core/customer";
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL,$uri);
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS,$data_string);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+'Content-Type: application/json',
+'Accept: */*',
+'X-Auth-Token:'. $token,
+'Content-Length: ' . strlen($data_string))
+); 
+$result = curl_exec($ch);
+if($DEBUG==1)print_r($result);
+echo "<br><br>";
+$result = json_decode($result,true);
+if($DEBUG==1)print_r($result);
+$customer_id = $result;
+if($DEBUG==1)echo("<br>CUSTOMER ID:". $customer_id);
+curl_close($ch);
+return $customer_id;
+}
+
+//************************************************
+//********** CREATE RESERVATION ******************
+//************************************************
+function _lightspeed_restaurant_create_reservation($token,$cid){
+global $DEBUG;
+
+//$DEBUG =0;
+//status = {CANCELLED, SEATED, UNKNOWN, ON_HOLD, TO_CHECK, CONFIRMED}
+//Formats for endTime and starTime are not ok
+$params = array(
+  "companyId" =>companyId,
+  "customerId"=> $cid,
+  "endTime"=> "2017-03-24T14:00:00Z",
+  "floorId"=> 1,
+  "id"=> 1,
+  "notes"=> "Reserve this table for me",
+  "reservationName"=> "New Reservation",
+  "seats"=> 2,
+  "startTime"=> "2017-03-24T13:00:00Z",
+  "status"=> "TO_CHECK",
+  "tableId"=> "1",
+  "telephone"=> "33333333"
+);
+$data_string = json_encode($params);
+
+if($DEBUG==1)print_r($data_string);
+$uri = "http://staging-exact-integration.posios.com/PosServer/rest/reservation";
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL,$uri);
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS,$data_string);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+'Content-Type: application/json',
+'Accept: */*',
+'X-Auth-Token:'. $token,
+'Content-Length: ' . strlen($data_string))
+); 
+$result = curl_exec($ch);
+//$result = json_decode($result, true);
+//Get Access Token on Successful Setup & Initialization of the User
+if($DEBUG==1)print_r($result);
+$result = json_decode($result,true);
+if($DEBUG==1)print_r($result);
+$reservation_id = $result;
+if($DEBUG==1)echo("<br>Reservation Number:". $reservation_id);
+echo "<br><br>";
+curl_close($ch);
+return $reservation_id;
+}
+
+//************************************************
+//********* CREATE PRODUCT ***********************doesnt work
+//************************************************
+function _lightspeed_restaurant_create_product($token,$gid){
+global $DEBUG;
+$gid = 1;
+
+$params = array(
+  "additions"=>
+    array(
+      "displayName" => "Irish Egg Rolls",
+      "id"=> 1,
+      "maxSelectedAmount"=> 8.25,
+      "minSelectedAmount"=> 8.25,
+      "multiselect"=> true,
+      "name"=> "Irish Egg Rolls",
+      "values"=>
+       array(
+          "id"=> 1,
+          "info"=> "Corned beef cabbage and cheese fried in a wonton",
+          "modifierId"=> 0,
+          "name"=> "Irish Egg Rolls",
+          "price"=> 8.25,
+          "priceWithoutVAT"=> 8
+        )
+    ),
+  "deliveryPrice"=> 9,
+  "deliveryPriceWithoutVat"=> 8.7,
+  "deliveryTaxClass"=> "VAT",
+  "groupIds"=> array(
+    1
+  ),
+  "id"=> 1,
+  "imageLocation"=> "",
+  "info"=> "Corned beef cabbage and cheese fried in a wonton",
+  "name"=> "Irish Egg Rolls",
+  "price"=> 8.25,
+  "priceWithoutVat"=> 8,
+  "productType"=> "Appetizers",
+  "sequence"=> 0,
+  "sku"=> "0c54a",
+  "stockAmount"=> 1,
+  "takeawayPrice"=> 0,
+  "takeawayPriceWithoutVat"=> 8,
+  "takeawayTaxClass"=> "Taxaway",
+  "taxClass"=> "Tax",
+  "visible"=> true
+);
+$data_string = json_encode($params);
+
+if($DEBUG==1)print_r($data_string);
+$uri = "http://staging-exact-integration.posios.com/PosServer/rest/inventory/productgroup/".$gid."/product";
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL,$uri);
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS,$data_string);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+'Content-Type: application/json',
+'Accept: */*',
+'X-Auth-Token:'. $token,
+'id:'.$gid,
+'Content-Length: ' . strlen($data_string))
+); 
+$result = curl_exec($ch);
+//$result = json_decode($result, true);
+//Get Access Token on Successful Setup & Initialization of the User
+if($DEBUG==1)print_r($result);
+$result = json_decode($result,true);
+if($DEBUG==1)print_r($result);
+/*$reservation_id = $result;
+if($DEBUG==1)echo("<br>Reservation Number:". $reservation_id);
+echo "<br><br>";
+curl_close($ch);
+return $reservation_id;*/
+}
+
+
+//************************************************
+//********** CREATE ORDER ************************
+//************************************************
+function _lightspeed_restaurant_create_order($token,$cid,$ordered_items){
+global $DEBUG;
+
+
+$in_an_hour = strtotime('+1 hour');
+//$DEBUG =1;
+$params = 
+array (
+  'companyId' => companyId,
+  'customerId' => $cid,
+  'type' => 'delivery',
+  'creationDate' => date('Y-m-dTh:i:sZ'),//'2017-04-18T18:42:10-05:00',
+  'deliveryDate' => /*date('Y-m-dTh:i:sZ'),// strtotime(date('Y-m-dTh:i:sZ'))+3600),/*/'2017-04-18T19:45:00-05:00',
+  'status' => 'ACCEPTED',
+  'description' => 'YPDine OO',
+  'orderItems' => $ordered_items,
+  /*array (
+    0 => 
+    array (
+      'productId' => 137050,
+      'amount' => 1,
+      'totalPrice' => 13.56,
+      'totalPriceWithoutVat' => 12,
+      'unitPrice' => 6.78,
+      'unitPriceWithoutVat' => 6,
+      'modifiers' => 
+      array (
+        0 => 
+        array (
+          'modifierId' => 1830,
+          'modifierValueId' => 5947,
+          'description' => 'Cheese',
+          'modifierName' => 'Cheese',
+          'price' => 3.39,
+          'priceWithoutVat' => 3,
+        ),
+        1 => 
+        array (
+          'modifierId' => 1830,
+          'modifierValueId' => 5948,
+          'description' => 'Cheese',
+          'modifierName' => 'Cheese',
+          'price' => 3.39,
+          'priceWithoutVat' => 3,
+        ),
+      ),
+    ),
+    1 => 
+    array (
+      'productId' => 137050,
+      'amount' => 1,
+      'totalPrice' => 5.65,
+      'totalPriceWithoutVat' => 5,
+      'unitPrice' => 5.65,
+      'unitPriceWithoutVat' => 5,
+    ),
+  ),*/
+ /* 'orderPayment' => 
+  array (
+    'amount' => 1,
+    'paymentTypeId' => 4138,
+    'paymentTypeTypeId' => 1,
+  ),*/
+  'orderTaxInfo' => 
+  array (
+    0 => 
+    array (
+      'tax' => 0.13,
+      'taxRate' => 0.13,
+      'totalWithTax' => 24.85,
+      'totalWithoutTax' => 22,
+    ),
+  ),
+);
+
+
+$data_string = json_encode($params);
+
+//GET TOKEN
+if($DEBUG==1)print_r($data_string);
+$uri = "http://staging-exact-integration.posios.com/PosServer/rest/onlineordering/customer/".$cid."/establishmentorder";
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL,$uri);
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS,$data_string);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+'Content-Type: application/json',
+'Accept: */*',
+'X-Auth-Token:'. $token,
+'customer'. $cid,
+'Content-Length: ' . strlen($data_string))
+); 
+$result = curl_exec($ch);
+//$result = json_decode($result, true);
+//Get Access Token on Successful Setup & Initialization of the User
+if($DEBUG==1)print_r($result);
+$result = json_decode($result,true);
+if($DEBUG==1)print_r($result);
+
+if($DEBUG==1)echo("<br>ORDER:". $order);
+curl_close($ch);
+//return $access_token;
+
+}
+
+
+//************************************************
+//    Function Get Products
+//************************************************
+
+function _lightspeed_restaurant_get_products($token){
+global $DEBUG;
+
+$uri = "http://staging-exact-integration.posios.com/PosServer/rest/inventory/product";
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL,$uri);
+//curl_setopt($ch, CURLOPT_POST, 1);
+//curl_setopt($ch, CURLOPT_POSTFIELDS,$data_string);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+'Content-Type: application/json',
+'Accept: */*',
+'X-Auth-Token:'. $token,
+//'customer'. $cid,
+//'Content-Length: ' . strlen($data_string)
+)
+); 
+$result = curl_exec($ch);
+$result = json_decode($result,true);
+if($DEBUG==1)print_r($result);
+//if($DEBUG==1)echo("<br>ACCESS TOKEN:". $access_token);
+curl_close($ch);
+return $result;
+
+}
+
+//************************************************
+//    HOOK  
+//************************************************
+function lightspeed_restaurant_commerce_checkout_complete($order){
+$ordered_items=array();
+
+/********************** GET LIGHTSPEED PRODUCT ID ****************************************/
+
+    for($i=0;$i<=count($order->commerce_line_items)+1;$i++){// as $key => $line_item_wrapper) {
+      //$line_item = $line_item_wrapper->value();
+        $query = db_select('field_data_commerce_product', 'n')
+        ->fields('n', array('commerce_product_product_id'))
+        ->condition('entity_id',  $order->commerce_line_items['und'][$i]['line_item_id'],'=');
+        $result = $query->execute();
+        $pid = $result->fetchField();
+      
+        $query = db_select('field_data_field_menu_variants', 'n')
+        ->fields('n', array('entity_id'))
+        ->condition('field_menu_variants_product_id', $pid,'=');
+        $result = $query->execute();
+        $nid = $result->fetchField();
+        
+        $query = db_select('field_data_field_lightspeed_code', 'n')
+        ->fields('n', array('field_lightspeed_code_value'))
+        ->condition('entity_id', $nid,'=');
+        $result = $query->execute();
+        $ligthspeed_product_id= $result->fetchField();
+
+    /********************** GET UNIT PRICE ****************************************/
+        $query = db_select('field_data_commerce_unit_price', 'n')
+        ->fields('n', array('commerce_unit_price_amount'))
+        ->condition('entity_id',  $order->commerce_line_items['und'][$i]['line_item_id'],'=');
+        $result = $query->execute();
+        $unit_price = $result->fetchField()/100;
+    /********************** GET UNIT QUANTITY ****************************************/
+        $query = db_select('commerce_line_item', 'n')
+        ->fields('n', array('quantity'))
+        ->condition('line_item_id',  $order->commerce_line_items['und'][$i]['line_item_id'],'=');
+        $result = $query->execute();
+        $unit_quantity = $result->fetchField();    
+     /********************** GET CART QUANTITY AND TOTALS ****************************************/
+    $wrapper = entity_metadata_wrapper('commerce_order', $order);
+    $line_items = $wrapper->commerce_line_items;
+    $quantity = commerce_line_items_quantity($line_items, commerce_product_line_item_types());
+    $total = commerce_line_items_total($line_items);
+     /********************** GET CART CURRENCY AND TOTALS ****************************************/ 
+     $currency = commerce_currency_load(commerce_default_currency());
+     $product_price_total = commerce_currency_format($total['amount'], $total['currency_code']); 
+        
+      $temp =  array (
+      'productId' => $ligthspeed_product_id,
+      'amount' => intval($unit_quantity),
+      'totalPrice' => $total['amount']/100,
+      'totalPriceWithoutVat' =>$total['amount']/100,
+      'unitPrice' => floatval($unit_price),
+      'unitPriceWithoutVat' => floatval($unit_price),
+       );
+        
+        array_push($ordered_items,$temp);
+        
+    }
+
+//MAIN CODE
+$tok = _lightspeed_restaurant_get_token();
+$cid = '32052';//create_customer($tok);
+//get_products($tok);
+//create_product($tok,1);
+//create_reservation($tok,$cid);
+_lightspeed_restaurant_create_order($tok,$cid,$ordered_items);
+}
+
+function _lightspeed_commerce_cart_details() {
+  global $user;
+  $output = array();
+
+  $order = commerce_cart_order_load($user->uid);
+
+  if ($order) {
+    $wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    $output['order'] = $order;
+    $output['wrapper'] = $wrapper;
+  }
+  else {
+    $output['order'] = NULL;
+    $output['wrapper'] = NULL;
+  }
+
+  return $output;
+}
+?>
