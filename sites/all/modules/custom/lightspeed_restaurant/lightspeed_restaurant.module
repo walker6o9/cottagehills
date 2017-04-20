@@ -281,16 +281,19 @@ return $reservation_id;*/
 function _lightspeed_restaurant_create_order($token,$cid,$ordered_items){
 global $DEBUG;
 
-
-$in_an_hour = strtotime('+1 hour');
+$in_an_hour = date('Y-m-dTh:i:s') + strtotime('+3 hour');
+$in_an_hour2=date('Y-m-dTh:i:s',$in_an_hour);
+$a=strstr($in_an_hour2, 'MU', true);
+$b=explode("MU",strstr($in_an_hour2, 'MU'))[1];
+//$in_an_hour = strtotime('+1 hour');
 //$DEBUG =1;
 $params = 
 array (
   'companyId' => companyId,
   'customerId' => $cid,
   'type' => 'delivery',
-  'creationDate' => date('Y-m-dTh:i:sZ'),//'2017-04-18T18:42:10-05:00',
-  'deliveryDate' => /*date('Y-m-dTh:i:sZ'),// strtotime(date('Y-m-dTh:i:sZ'))+3600),/*/'2017-04-18T19:45:00-05:00',
+  'creationDate' => date('Y-m-dTh:i:s').'-06:00',//'2017-04-18T18:42:10-05:00',
+  'deliveryDate' => $a.$b.'-06:00',//date('Y-m-dTh:i:s.uZ',strtotime('+1 hours')),// strtotime(date('Y-m-dTh:i:sZ'))+3600),//*/'2017-04-18T19:45:00-05:00',
   'status' => 'ACCEPTED',
   'description' => 'YPDine OO',
   'orderItems' => $ordered_items,
@@ -484,25 +487,5 @@ $cid = '32052';//create_customer($tok);
 //create_product($tok,1);
 //create_reservation($tok,$cid);
 _lightspeed_restaurant_create_order($tok,$cid,$ordered_items);
-}
-
-function _lightspeed_commerce_cart_details() {
-  global $user;
-  $output = array();
-
-  $order = commerce_cart_order_load($user->uid);
-
-  if ($order) {
-    $wrapper = entity_metadata_wrapper('commerce_order', $order);
-
-    $output['order'] = $order;
-    $output['wrapper'] = $wrapper;
-  }
-  else {
-    $output['order'] = NULL;
-    $output['wrapper'] = NULL;
-  }
-
-  return $output;
 }
 ?>
