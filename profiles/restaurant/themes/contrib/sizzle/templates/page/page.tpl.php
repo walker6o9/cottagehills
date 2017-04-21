@@ -49,6 +49,7 @@
       </div>
     </div>
   </nav>
+  <?php dpm(get_defined_vars()); ?>
 
   <main id="main" class="main">
     <?php if ($messages): ?>

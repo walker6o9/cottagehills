@@ -1,29 +1,22 @@
 <?php
 error_reporting(E_ALL); 
 ini_set('display_errors','1');
- 
- /*$companyId=14431;
+ $companyId=14431;
  $deviceId="api";
  $password="bK6Vre2QtGZdZ5q7";
- $username="staging@stevekemph.com";*/
- $DEBUG = 0;
-
-
-define("companyId", 14431);
-define("deviceId", "api");
-define("password", "bK6Vre2QtGZdZ5q7");
-define("username", "staging@stevekemph.com");
+ $username="staging@stevekemph.com";
+ $DEBUG = 1;
 
 //************************************************
 //********** GET TOKEN ***************************
 //************************************************
-function _lightspeed_restaurant_get_token(){
-global $DEBUG;
+function get_token(){
+global $companyId,$deviceId,$password,$username,$DEBUG;
 //$DEBUG =0;
-$params = array("companyId"=>companyId,
-				"deviceId" =>deviceId,
-				"password" =>password,
-				"username" =>username
+$params = array("companyId"=>$companyId,
+				"deviceId" =>$deviceId,
+				"password" =>$password,
+				"username" =>$username
 				);
 
 //$data_string =   "companyId".trim($params[0])."&deviceId=".trim($params[1])."&password=".trim($params[2])."&username=".trim($params[3]);
@@ -59,8 +52,8 @@ return $access_token;
 //************************************************
 //*********** CREATE CUSTOMER ********************
 //************************************************
-function _lightspeed_restaurant_create_customer($token){
-//global $companyId,$deviceId,$password,$username,$DEBUG;
+function create_customer($token){
+global $companyId,$deviceId,$password,$username,$DEBUG;
 
 //$DEBUG =0;
 $params = array(/*
@@ -149,14 +142,14 @@ return $customer_id;
 //************************************************
 //********** CREATE RESERVATION ******************
 //************************************************
-function _lightspeed_restaurant_create_reservation($token,$cid){
-global $DEBUG;
+function create_reservation($token,$cid){
+global $companyId,$deviceId,$password,$username,$DEBUG;
 
 //$DEBUG =0;
 //status = {CANCELLED, SEATED, UNKNOWN, ON_HOLD, TO_CHECK, CONFIRMED}
 //Formats for endTime and starTime are not ok
 $params = array(
-  "companyId" =>companyId,
+  "companyId" =>$companyId,
   "customerId"=> $cid,
   "endTime"=> "2017-03-24T14:00:00Z",
   "floorId"=> 1,
@@ -198,10 +191,10 @@ return $reservation_id;
 }
 
 //************************************************
-//********* CREATE PRODUCT ***********************doesnt work
+//********* CREATE PRODUCT ***********************
 //************************************************
-function _lightspeed_restaurant_create_product($token,$gid){
-global $DEBUG;
+function create_product($token,$gid){
+global $companyId,$deviceId,$password,$username,$DEBUG;
 $gid = 1;
 
 $params = array(
@@ -278,34 +271,21 @@ return $reservation_id;*/
 //************************************************
 //********** CREATE ORDER ************************
 //************************************************
-function _lightspeed_restaurant_create_order($token,$cid,$ordered_items){
-global $DEBUG;
-/*
-$in_an_hour = date('Y-m-dTH:i:s') + strtotime('1 hour');
-$in_an_hour2=date('Y-m-dTH:i:s',$in_an_hour);
-$a=strstr($in_an_hour2, 'MU', true);
-$b=explode("MU",strstr($in_an_hour2, 'MU'))[1];
-//$in_an_hour = strtotime('+1 hour');
+function create_order($token,$cid){
+global $companyId,$deviceId,$password,$username,$DEBUG;
+
 //$DEBUG =1;
-$c=(string)($a.$b.'-05:00');
-*/
-$now = new DateTime('NOW');
-//$now->format('Y-m-d H:i'); 
-$now->format('c'); 
-//$now->->format(DateTime::ISO8601);
-$in_an_hour = clone $now;    
-$in_an_hour->modify( '+1 hour' );
 $params = 
 array (
-  'companyId' => companyId,
+  'companyId' => $companyId,
   'customerId' => $cid,
   'type' => 'delivery',
-  'creationDate' => $now->format('c'),//date("Y-m-dTh:i:s.Z"),//.'-06:00',//*/'2017-04-23T18:42:10-05:00',//2017-04-21T01:04:25-06:00
-  'deliveryDate' => $in_an_hour->format('c'),/*$a.$b.'-06:00',//date('Y-m-dTh:i:s.uZ',strtotime('+1 hours')),// strtotime(date('Y-m-dTh:i:sZ'))+3600),///'2017-04-22T00:49:00-04:00',*/
+  'creationDate' => '2017-04-17T18:42:10-05:00',
+  'deliveryDate' => '2017-04-17T19:45:00-05:00',
   'status' => 'ACCEPTED',
   'description' => 'YPDine OO',
-  'orderItems' => $ordered_items,
-  /*array (
+  'orderItems' => 
+  array (
     0 => 
     array (
       'productId' => 137050,
@@ -345,7 +325,7 @@ array (
       'unitPrice' => 5.65,
       'unitPriceWithoutVat' => 5,
     ),
-  ),*/
+  ),
  /* 'orderPayment' => 
   array (
     'amount' => 1,
@@ -388,27 +368,11 @@ $result = curl_exec($ch);
 if($DEBUG==1)print_r($result);
 $result = json_decode($result,true);
 if($DEBUG==1)print_r($result);
-
+$order = $result['id'];
 if($DEBUG==1)echo("<br>ORDER:". $order);
 curl_close($ch);
+//return $access_token;
 
-$filename = '/tmp/data.txt';
-// var_dump
-ob_start();
-var_dump($result);
-$debug_dump = ob_get_clean();
-//$debug_dump = var_export($result, true);
-try{ 
-$file = fopen($filename, "w");
-fwrite($file, $debug_dump. PHP_EOL);
-fwrite($file, "".$params['creationDate'] .  PHP_EOL);
-fclose($file);
-} catch(Exception $e) {
-       echo("Error :". $e->getMessage());
-}
-
-
-return $result;
 }
 
 
@@ -416,8 +380,8 @@ return $result;
 //    Function Get Products
 //************************************************
 
-function _lightspeed_restaurant_get_products($token){
-global $DEBUG;
+function get_products($token){
+global $companyId,$deviceId,$password,$username,$DEBUG;
 
 $uri = "http://staging-exact-integration.posios.com/PosServer/rest/inventory/product";
 $ch = curl_init();
@@ -434,96 +398,28 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 )
 ); 
 $result = curl_exec($ch);
+//$result = json_decode($result, true);
+//Get Access Token on Successful Setup & Initialization of the User
+//if($DEBUG==1)print_r($result);
 $result = json_decode($result,true);
-if($DEBUG==1)print_r($result);
+if($DEBUG==1)/*print_r($result);*/var_dump($result);
+//$access_token = $result['token'];
 //if($DEBUG==1)echo("<br>ACCESS TOKEN:". $access_token);
+
+
+
 curl_close($ch);
-
-
-$filename = '/var/www/cottagegit/cottagehills/sites/default/files/data.txt';
-
-try{ 
-$file = fopen($filename, "w");
-fwrite($file, $result . PHP_EOL);
-fclose($file);
-} catch(Exception $e) {
-       echo("Error :". $e->getMessage());
-}
-
 return $result;
 
 }
 
 //************************************************
-//    HOOK  
+//    MAIN CODE
 //************************************************
-function lightspeed_restaurant_commerce_checkout_complete($order){
-$ordered_items=array();
-
-/********************** GET LIGHTSPEED PRODUCT ID ****************************************/
-
-    for($i=0;$i<count($order->commerce_line_items['und']);$i++){// as $key => $line_item_wrapper) {
-      //$line_item = $line_item_wrapper->value();
-        $query = db_select('field_data_commerce_product', 'n')
-        ->fields('n', array('commerce_product_product_id'))
-        ->condition('entity_id',  $order->commerce_line_items['und'][$i]['line_item_id'],'=');
-        $result = $query->execute();
-        $pid = $result->fetchField();
-      
-        $query = db_select('field_data_field_menu_variants', 'n')
-        ->fields('n', array('entity_id'))
-        ->condition('field_menu_variants_product_id', $pid,'=');
-        $result = $query->execute();
-        $nid = $result->fetchField();
-        
-        $query = db_select('field_data_field_lightspeed_code', 'n')
-        ->fields('n', array('field_lightspeed_code_value'))
-        ->condition('entity_id', $nid,'=');
-        $result = $query->execute();
-        $ligthspeed_product_id= $result->fetchField();
-
-    /********************** GET UNIT PRICE ****************************************/
-        $query = db_select('field_data_commerce_unit_price', 'n')
-        ->fields('n', array('commerce_unit_price_amount'))
-        ->condition('entity_id',  $order->commerce_line_items['und'][$i]['line_item_id'],'=');
-        $result = $query->execute();
-        $unit_price = $result->fetchField()/100;
-    /********************** GET UNIT QUANTITY ****************************************/
-        $query = db_select('commerce_line_item', 'n')
-        ->fields('n', array('quantity'))
-        ->condition('line_item_id',  $order->commerce_line_items['und'][$i]['line_item_id'],'=');
-        $result = $query->execute();
-        $unit_quantity = $result->fetchField();    
-     /********************** GET CART QUANTITY AND TOTALS ****************************************/
-    $wrapper = entity_metadata_wrapper('commerce_order', $order);
-    $line_items = $wrapper->commerce_line_items;
-    $quantity = commerce_line_items_quantity($line_items, commerce_product_line_item_types());
-    $total = commerce_line_items_total($line_items);
-     /********************** GET CART CURRENCY AND TOTALS ****************************************/ 
-     $currency = commerce_currency_load(commerce_default_currency());
-     $product_price_total = commerce_currency_format($total['amount'], $total['currency_code']); 
-        
-      $temp =  array (
-      'productId' => $ligthspeed_product_id,
-      'amount' => intval($unit_quantity),
-      'totalPrice' => $total['amount']/100,
-      'totalPriceWithoutVat' =>$total['amount']/100,
-      'unitPrice' => floatval($unit_price),
-      'unitPriceWithoutVat' => floatval($unit_price),
-       );
-        
-        array_push($ordered_items,$temp);
-        
-    }
-
-//MAIN CODE
-$tok = _lightspeed_restaurant_get_token();
-$cid = '32049';//52';//create_customer($tok);
-//get_products($tok);
+$tok = get_token();
+$cid = '32052';//create_customer($tok);
+get_products($tok);
 //create_product($tok,1);
 //create_reservation($tok,$cid);
-$resultado = _lightspeed_restaurant_create_order($tok,$cid,$ordered_items);
-dsm($resultado);
-print_r($resultado);
-}
+//$order = create_order($tok,$cid);
 ?>

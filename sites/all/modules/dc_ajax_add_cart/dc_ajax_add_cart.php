@@ -2,7 +2,8 @@
 $erl = error_reporting(E_ALL);
 
 
-$servername = "cottage.c8ev03tuhhye.us-west-2.rds.amazonaws.com";
+//$servername = "cottage.c8ev03tuhhye.us-west-2.rds.amazonaws.com";
+$servername = "cottage-restored.c8ev03tuhhye.us-west-2.rds.amazonaws.com";
 $username = "cottage";
 $password = "5iaGNy4RXryLsQzl";
 $dbname = "cottagelive";

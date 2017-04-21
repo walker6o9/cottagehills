@@ -41,3 +41,4 @@
 <div class="device-lg visible-lg"></div>
 </body>
 </html>
+<?php dpm(get_defined_vars()); ?>
