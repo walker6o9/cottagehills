@@ -45,4 +45,22 @@ function restaurant_reservation_form_eck__entity__form_add_reservation_reservati
 
   // Redirect to the reservation page.
   $form_state['redirect'] = current_path();
+  
+  //ligthspeed implementation
+  $tz = new DateTimeZone($form['field_reservation_date']['und'][0]['#date_items']['timezone']);
+  $now = new DateTime($form['field_reservation_date']['und'][0]['#date_items']['value'],$tz);
+  $in_an_hour = clone $now;    
+  $in_an_hour->modify( '+1 hour' );
+  $reserv = array();
+  $reserv['date'] = $now->format('c');
+  $reserv['date_end'] =  $in_an_hour->format('c');
+  $reserv['message'] = "".$form['field_reservation_message']['und'][0]['value']['#value'];
+  $reserv['name'] = "".$form['field_reservation_name']['und'][0]['value']['#value'];
+  $reserv['party_size'] = "".$form['field_reservation_party_size']['und'][0]['value']['#value'];
+  $reserv['phone'] = "".$form['field_reservation_phone']['und'][0]['value']['#value'];
+  $reserv['email'] = "".$form['field_reservation_email']['und'][0]['email']['#value'];
+  $tok = _lightspeed_restaurant_get_token();
+  $cid = '32049';
+  $reservation = _lightspeed_restaurant_create_reservation($tok,$cid,$reserv);
+
 }

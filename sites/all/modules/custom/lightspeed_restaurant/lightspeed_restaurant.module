@@ -149,7 +149,7 @@ return $customer_id;
 //************************************************
 //********** CREATE RESERVATION ******************
 //************************************************
-function _lightspeed_restaurant_create_reservation($token,$cid){
+function _lightspeed_restaurant_create_reservation($token,$cid,$reserv){
 global $DEBUG;
 
 //$DEBUG =0;
@@ -158,16 +158,16 @@ global $DEBUG;
 $params = array(
   "companyId" =>companyId,
   "customerId"=> $cid,
-  "endTime"=> "2017-03-24T14:00:00Z",
+  "endTime"=> $reserv['date_end'],//"2017-03-24T14:00:00Z",
   "floorId"=> 1,
   "id"=> 1,
-  "notes"=> "Reserve this table for me",
-  "reservationName"=> "New Reservation",
-  "seats"=> 2,
-  "startTime"=> "2017-03-24T13:00:00Z",
+  "notes"=> $reserv['message'],//"Reserve this table for me",
+  "reservationName"=> $reserv['name'],//"New Reservation",
+  "seats"=> $reserv['party_size'],//2,
+  "startTime"=> $reserv['date'],//"2017-03-24T13:00:00Z",
   "status"=> "TO_CHECK",
   "tableId"=> "1",
-  "telephone"=> "33333333"
+  "telephone"=> $reserv['phone'],//"33333333"
 );
 $data_string = json_encode($params);
 
@@ -280,15 +280,7 @@ return $reservation_id;*/
 //************************************************
 function _lightspeed_restaurant_create_order($token,$cid,$ordered_items){
 global $DEBUG;
-/*
-$in_an_hour = date('Y-m-dTH:i:s') + strtotime('1 hour');
-$in_an_hour2=date('Y-m-dTH:i:s',$in_an_hour);
-$a=strstr($in_an_hour2, 'MU', true);
-$b=explode("MU",strstr($in_an_hour2, 'MU'))[1];
-//$in_an_hour = strtotime('+1 hour');
-//$DEBUG =1;
-$c=(string)($a.$b.'-05:00');
-*/
+
 $now = new DateTime('NOW');
 //$now->format('Y-m-d H:i'); 
 $now->format('c'); 
@@ -299,9 +291,9 @@ $params =
 array (
   'companyId' => companyId,
   'customerId' => $cid,
-  'type' => 'delivery',
-  'creationDate' => $now->format('c'),//date("Y-m-dTh:i:s.Z"),//.'-06:00',//*/'2017-04-23T18:42:10-05:00',//2017-04-21T01:04:25-06:00
-  'deliveryDate' => $in_an_hour->format('c'),/*$a.$b.'-06:00',//date('Y-m-dTh:i:s.uZ',strtotime('+1 hours')),// strtotime(date('Y-m-dTh:i:sZ'))+3600),///'2017-04-22T00:49:00-04:00',*/
+  'type' => 'takeaway',
+  'creationDate' => $now->format('c'),//2017-04-21T01:04:25-06:00,
+  'deliveryDate' => $in_an_hour->format('c'),//'2017-04-22T00:49:00-04:00',
   'status' => 'ACCEPTED',
   'description' => 'YPDine OO',
   'orderItems' => $ordered_items,
@@ -439,17 +431,6 @@ if($DEBUG==1)print_r($result);
 //if($DEBUG==1)echo("<br>ACCESS TOKEN:". $access_token);
 curl_close($ch);
 
-
-$filename = '/var/www/cottagegit/cottagehills/sites/default/files/data.txt';
-
-try{ 
-$file = fopen($filename, "w");
-fwrite($file, $result . PHP_EOL);
-fclose($file);
-} catch(Exception $e) {
-       echo("Error :". $e->getMessage());
-}
-
 return $result;
 
 }
@@ -523,7 +504,25 @@ $cid = '32049';//52';//create_customer($tok);
 //create_product($tok,1);
 //create_reservation($tok,$cid);
 $resultado = _lightspeed_restaurant_create_order($tok,$cid,$ordered_items);
-dsm($resultado);
-print_r($resultado);
 }
-?>
+
+/*
+function lightspeed_restaurant_form_eck__entity__form_add_reservation_reservation_submit($form, &$form_state) {
+$filename = '/tmp/reservation.txt';
+// var_dump
+ob_start();
+var_dump($form);
+//var_dump($form_state);
+//var_dump($form_id);
+$debug_dump = ob_get_clean();
+//$debug_dump = var_export($result, true);
+try{ 
+$file = fopen($filename, "w");
+fwrite($file, $debug_dump. PHP_EOL);
+//fwrite($file, "".$params['creationDate'] .  PHP_EOL);
+fclose($file);
+} catch(Exception $e) {
+       echo("Error :". $e->getMessage());
+}
+
+}*/
