@@ -59,8 +59,8 @@ return $access_token;
 //************************************************
 //*********** CREATE CUSTOMER ********************
 //************************************************
-function _lightspeed_restaurant_create_customer($token){
-//global $companyId,$deviceId,$password,$username,$DEBUG;
+function _lightspeed_restaurant_create_customer($token, $values){
+global /*$companyId,$deviceId,$password,$username,*/$DEBUG;
 
 //$DEBUG =0;
 $params = array(/*
@@ -102,20 +102,20 @@ $params = array(/*
 );
 */
 
-  "city"=> "New York",
-  "country"=> "USA",
-  "deliveryCity"=> "Manhatan",
-  "deliveryCountry"=> "USA",
-  "deliveryStreet"=> "11ST",
-  "deliveryStreetNumber"=> "2",
-  "deliveryZip"=> "10001",
-  "email"=> "ramsesiden@test14.com",
-  "firstName"=> "test1",
-  "lastName"=> "testlast1",
-  "street"=> "Eleven street",
-  "streetNumber"=> "3",
-  "telephone"=> "123456789",
-  "zip"=> "10001"
+  "city"=>  empty($values['city'])?"Illinois":$values['city'],//"New York",
+  "country"=> empty($values['country'])?"USA":$values['country'],// "USA",
+  "deliveryCity"=> empty($values['delCity'])?"Illinois":$values['delCity'],//"Manhatan",
+  "deliveryCountry"=> empty($values['delCountry'])?"USA":$values['delCountry'],//"USA",
+  "deliveryStreet"=> empty($values['delStreet'])?"":$values['delStreet'],//"11ST",
+  "deliveryStreetNumber"=> empty($values['delStreetNo'])?"":$values['delStreetNo'],//"2",
+  "deliveryZip"=> empty($values['delZip'])?"":$values['delZip'],//"10001",
+  "email"=> $values['email'],//"ramsesiden@test14.com",
+  "firstName"=> $values['fname'],//"test1",
+  "lastName"=> $values['lname'],//"testlast1",
+  "street"=> empty($values['street'])?"":$values['street'],//"Eleven street",
+  "streetNumber"=> empty($values['stNo'])?"":$values['stNo'],//"3",
+  "telephone"=> $values['phone'],//"123456789",
+  "zip"=> empty($values['zip'])?"":$values['zip'],//"10001"
 );
 
 //$data_string =   "companyId".trim($params[0])."&deviceId=".trim($params[1])."&password=".trim($params[2])."&username=".trim($params[3]);
