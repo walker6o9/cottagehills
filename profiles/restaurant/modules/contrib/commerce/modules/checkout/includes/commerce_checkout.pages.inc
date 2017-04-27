@@ -349,11 +349,18 @@ function commerce_checkout_form_validate($form, &$form_state) {
  * Submit handler for the continue button of the checkout form.
  */
 function commerce_checkout_form_submit($form, &$form_state) {
+  $data_from_form = array();
   $checkout_page = $form_state['checkout_page'];
 
   // Load a fresh copy of the order stored in the form.
   $order = commerce_order_load($form_state['order']->order_id);
 
+  $data_from_form['name'] = $form_state['values']['customer_profile_billing']['customer_profile']->commerce_customer_address['und'][0]['first_name'];
+  $data_from_form['lastname'] = $form_state['values']['customer_profile_billing']['customer_profile']->commerce_customer_address['und'][0]['last_name'];
+  $data_from_form['email'] = $form_state['build_info']['args'][0]->mail;
+  _lightspeed_restaurant_create_user_order($order,$data_from_form);
+  
+  
   // If we are going to redirect with checkout pane messages stored in the form
   // state, they will not be displayed on a subsequent form build like normal.
   // Move them out of the form state messages array and into the current

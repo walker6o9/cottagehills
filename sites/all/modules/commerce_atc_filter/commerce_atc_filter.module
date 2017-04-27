@@ -23,18 +23,18 @@ function commerce_atc_filter_filter_info() {
  * Filter process callback. Replace the [product-button] tags with Add to Cart
  */
 function commerce_atc_filter_filter_process($text, $filter) {
-if(user_is_logged_in()){
+//if(user_is_logged_in()){
   // Prevent useless processing if there are no caption tags at all.
   if (stristr($text, '[product-button') !== FALSE) {
     $pattern = '/\[product-button:(\d+)([^\]]*)\]/i';
     $text = preg_replace_callback($pattern, '_commerce_atc_filter_filter_replace', $text);
   }
-}else{
+/*}else{
   if (stristr($text, '[product-button') !== FALSE) {
     $pattern = '/\[product-button:(\d+)([^\]]*)\]/i';
     $text = preg_replace_callback($pattern, 'nothing', '');
   }
-}
+}*/
   return $text;
 }
 

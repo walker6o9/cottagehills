@@ -61,16 +61,34 @@ function restaurant_reservation_form_eck__entity__form_add_reservation_reservati
   $reserv['phone'] = "".$form['field_reservation_phone']['und'][0]['value']['#value'];
   $reserv['email'] = "".$form['field_reservation_email']['und'][0]['email']['#value'];
   
-  $values['fname'] = "".$form['field_reservation_name']['und'][0]['value']['#value'];
-  $values['lname'] = "".$form['field_reservation_lastname']['und'][0]['value']['#value'];
-  $values['phone'] = "".$form['field_reservation_phone']['und'][0]['value']['#value'];
-  $values['email'] = "".$form['field_reservation_email']['und'][0]['email']['#value'];
   $tok = _lightspeed_restaurant_get_token();
-  
+
   if(user_is_anonymous()){
-    $cid = _lightspeed_restaurant_create_customer($tok, $values);
+    $res = _lightspeed_restaurant_get_customer($tok,trim($reserv['email']));
+    $values['fname'] = "".$form['field_reservation_name']['und'][0]['value']['#value'];
+    $values['lname'] = "".$form['field_reservation_lastname']['und'][0]['value']['#value'];
+    $values['phone'] = "".$form['field_reservation_phone']['und'][0]['value']['#value'];
+    $values['email'] = "".$form['field_reservation_email']['und'][0]['email']['#value'];
+    if(empty($res['results'])){
+          $cid = _lightspeed_restaurant_create_customer($tok, $values);
+    }else{
+          $cid = $res['results'][0]['id']; 
+    }
   }elseif(user_is_logged_in()){
-    $cid = '32049';
+    global $user;
+    $user_full = user_load($user->uid); // user_load(uid) returns the complete array
+    $res = _lightspeed_restaurant_get_customer($tok,trim($user->mail));
+    $values['fname'] = "".$user_full->field_given_name['und'][0]['value'];
+    $values['lname'] = "".$user_full->field_lastname['und'][0]['value'];
+    $values['phone'] = "".$user_full->field_telephone['und'][0]['value'];
+    $values['email'] = "".$user->mail;
+    //$cid = '32049';
+    if(empty($res['results'])){
+          $cid = _lightspeed_restaurant_create_customer($tok, $values);
+    }else{
+          $cid = $res['results'][0]['id']; 
+    }
+    
   }
   $reservation = _lightspeed_restaurant_create_reservation($tok,$cid,$reserv);
 
