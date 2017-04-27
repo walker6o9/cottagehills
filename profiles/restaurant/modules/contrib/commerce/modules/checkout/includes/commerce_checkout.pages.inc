@@ -358,7 +358,8 @@ function commerce_checkout_form_submit($form, &$form_state) {
   $data_from_form['name'] = $form_state['values']['customer_profile_billing']['customer_profile']->commerce_customer_address['und'][0]['first_name'];
   $data_from_form['lastname'] = $form_state['values']['customer_profile_billing']['customer_profile']->commerce_customer_address['und'][0]['last_name'];
   $data_from_form['email'] = $form_state['build_info']['args'][0]->mail;
-  _lightspeed_restaurant_create_user_order($order,$data_from_form);
+  _lightspeed_restaurant_save_on_temp($data_from_form);
+  //_lightspeed_restaurant_create_user_order($order,$data_from_form);
   
   
   // If we are going to redirect with checkout pane messages stored in the form

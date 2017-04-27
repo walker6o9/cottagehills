@@ -13,7 +13,6 @@ define("companyId", 14431);
 define("deviceId", "api");
 define("password", "bK6Vre2QtGZdZ5q7");
 define("username", "staging@stevekemph.com");
-
 //************************************************
 //********** GET TOKEN ***************************
 //************************************************
@@ -114,7 +113,7 @@ $params = array(/*
   "lastName"=> $values['lname'],//"testlast1",
   "street"=> empty($values['street'])?"":$values['street'],//"Eleven street",
   "streetNumber"=> empty($values['stNo'])?"":$values['stNo'],//"3",
-  "telephone"=> $values['phone'],//"123456789",
+  "telephone"=> empty($values['phone'])?"":$values['phone'],//"123456789",
   "zip"=> empty($values['zip'])?"":$values['zip'],//"10001"
 );
 
@@ -435,14 +434,89 @@ return $result;
 
 }
 
+
+//************************************************
+//    Function Get CUSTOMER
+//************************************************
+function _lightspeed_restaurant_get_customer($token,$email){
+global $DEBUG;
+
+$uri = "http://staging-exact-integration.posios.com/PosServer/rest/onlineordering/customer?email=".urlencode($email);
+        //    http://staging-exact-integration.posios.com/PosServer/rest/onlineordering/customer?email=omar%40ramsesiden.net
+        //GET http://staging-exact-integration.posios.com/PosServer/rest/onlineordering/customer?email=omar%40ramsesiden.net
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL,$uri);
+//curl_setopt($ch, CURLOPT_POST, 1);
+//curl_setopt($ch, CURLOPT_POSTFIELDS,$data_string);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+'Content-Type: application/json',
+'Accept: */*',
+'X-Auth-Token:'. $token,
+//'email:'.$email,
+//'customer'. $cid,
+//'Content-Length: ' . strlen($data_string)
+)
+); 
+$result = curl_exec($ch);
+$result = json_decode($result,true);
+if($DEBUG==1)print_r($result);
+//if($DEBUG==1)echo("<br>ACCESS TOKEN:". $access_token);
+curl_close($ch);
+
+return $result;
+
+//RPTA
+/*
+ {
+  "results": [
+    {
+      "id": 32051,
+      "uuid": "baa86ae1092c11e7a47f065ba9dd3bcf",
+      "firstName": "Omar",
+      "lastName": "Zorrilla Llerena",
+      "street": "Eleven street",
+      "streetNumber": "3",
+      "zip": "10001",
+      "city": "New York",
+      "country": "USA",
+      "telephone": "123456789",
+      "deliveryStreet": "11ST",
+      "deliveryStreetNumber": "2",
+      "deliveryZip": "10001",
+      "deliveryCity": "Manhatan",
+      "deliveryCountry": "USA",
+      "email": "omar@ramsesiden.net",
+      "credits": 0,
+      "companyId": 14431,
+      "modificationTime": "2017-04-23T18:42:30.443Z",
+      "note": "",
+      "vatNumber": "",
+      "dateOfBirth": "",
+      "language": "",
+      "customerCards": []
+    }
+  ],
+  "amount": 0,
+  "offset": 50,
+  "total": 1
+}
+*/
+}
 //************************************************
 //    HOOK  
-//************************************************
+//************************************************/
 function lightspeed_restaurant_commerce_checkout_complete($order){
 $ordered_items=array();
 
-/********************** GET LIGHTSPEED PRODUCT ID ****************************************/
+/********************** GET CUSTOMER DATA ****************************************/
+        $query = db_select('temp', 'n')
+        ->fields('n', array('data'))
+        ->condition('order_id',  $order->order_id,'=');
+        $result = $query->execute();
+        $customer = json_decode($result->fetchField());
 
+/********************** GET LIGHTSPEED PRODUCT ID ****************************************/
     for($i=0;$i<count($order->commerce_line_items['und']);$i++){// as $key => $line_item_wrapper) {
       //$line_item = $line_item_wrapper->value();
         $query = db_select('field_data_commerce_product', 'n')
@@ -494,35 +568,163 @@ $ordered_items=array();
        );
         
         array_push($ordered_items,$temp);
-        
     }
 
 //MAIN CODE
 $tok = _lightspeed_restaurant_get_token();
-$cid = '32049';//52';//create_customer($tok);
+//$cid = '32049';//52';//create_customer($tok);
 //get_products($tok);
 //create_product($tok,1);
 //create_reservation($tok,$cid);
+ if(user_is_anonymous()){
+    $res = _lightspeed_restaurant_get_customer($tok,trim($customer['email']));
+    $values['fname'] = "".$customer['name'];
+    $values['lname'] = "".$customer['lastname'];
+   // $values['phone'] = "".$customer['phone'];
+    $values['email'] = "".$customer['email'];
+    if(empty($res['results'])){
+          $cid = _lightspeed_restaurant_create_customer($tok, $values);
+    }else{
+          $cid = $res['results'][0]['id']; 
+    }
+  }elseif(user_is_logged_in()){
+    global $user;
+    $user_full = user_load($user->uid); // user_load(uid) returns the complete array
+    $res = _lightspeed_restaurant_get_customer($tok,trim($user->mail));
+    $values['fname'] = "".$user_full->field_given_name['und'][0]['value'];
+    $values['lname'] = "".$user_full->field_lastname['und'][0]['value'];
+    $values['phone'] = "".$user_full->field_telephone['und'][0]['value'];
+    $values['email'] = "".$user->mail;
+    if(empty($res['results'])){
+          $cid = _lightspeed_restaurant_create_customer($tok, $values);
+    }else{
+          $cid = $res['results'][0]['id']; 
+    }
+    
+  }
+
+ $resultado = _lightspeed_restaurant_create_order($tok,$cid,$ordered_items);
+ //return $resultado;
+}
+
+function   _lightspeed_restaurant_save_on_temp($values){
+global $user;
+$uid = $user->uid;  
+$order_id = commerce_cart_order_id($uid);
+
+        $query = db_select('temp', 'n')
+        ->fields('n', array('order_id'))
+        ->condition('order_id',  $order_id,'=');
+        $result = $query->execute();
+        $orden = $result->fetchField();
+if(empty($orden)){
+ $query =    db_insert('temp')
+->fields(array(
+  'order_id' => $order_id,
+  'data' => json_encode($values),
+  //'created' => REQUEST_TIME,
+))
+->execute();
+}
+
+    
+}
+
+//************************************************
+//    HOOK  
+//************************************************
+/*function _lightspeed_restaurant_commerce_checkout_complete($order){
+$ordered_items=array();
+
+/********************** GET LIGHTSPEED PRODUCT ID ****************************************
+    for($i=0;$i<count($order->commerce_line_items['und']);$i++){// as $key => $line_item_wrapper) {
+      //$line_item = $line_item_wrapper->value();
+        $query = db_select('field_data_commerce_product', 'n')
+        ->fields('n', array('commerce_product_product_id'))
+        ->condition('entity_id',  $order->commerce_line_items['und'][$i]['line_item_id'],'=');
+        $result = $query->execute();
+        $pid = $result->fetchField();
+      
+        $query = db_select('field_data_field_menu_variants', 'n')
+        ->fields('n', array('entity_id'))
+        ->condition('field_menu_variants_product_id', $pid,'=');
+        $result = $query->execute();
+        $nid = $result->fetchField();
+        
+        $query = db_select('field_data_field_lightspeed_code', 'n')
+        ->fields('n', array('field_lightspeed_code_value'))
+        ->condition('entity_id', $nid,'=');
+        $result = $query->execute();
+        $ligthspeed_product_id= $result->fetchField();
+
+    /********************** GET UNIT PRICE ****************************************
+        $query = db_select('field_data_commerce_unit_price', 'n')
+        ->fields('n', array('commerce_unit_price_amount'))
+        ->condition('entity_id',  $order->commerce_line_items['und'][$i]['line_item_id'],'=');
+        $result = $query->execute();
+        $unit_price = $result->fetchField()/100;
+    /********************** GET UNIT QUANTITY ****************************************
+        $query = db_select('commerce_line_item', 'n')
+        ->fields('n', array('quantity'))
+        ->condition('line_item_id',  $order->commerce_line_items['und'][$i]['line_item_id'],'=');
+        $result = $query->execute();
+        $unit_quantity = $result->fetchField();    
+     /********************** GET CART QUANTITY AND TOTALS ****************************************
+    $wrapper = entity_metadata_wrapper('commerce_order', $order);
+    $line_items = $wrapper->commerce_line_items;
+    $quantity = commerce_line_items_quantity($line_items, commerce_product_line_item_types());
+    $total = commerce_line_items_total($line_items);
+     /********************** GET CART CURRENCY AND TOTALS **************************************** 
+     $currency = commerce_currency_load(commerce_default_currency());
+     $product_price_total = commerce_currency_format($total['amount'], $total['currency_code']); 
+        
+      $temp =  array (
+      'productId' => $ligthspeed_product_id,
+      'amount' => intval($unit_quantity),
+      'totalPrice' => $total['amount']/100,
+      'totalPriceWithoutVat' =>$total['amount']/100,
+      'unitPrice' => floatval($unit_price),
+      'unitPriceWithoutVat' => floatval($unit_price),
+       );
+        
+        array_push($ordered_items,$temp);
+    }
+
+//MAIN CODE
+/*$tok = _lightspeed_restaurant_get_token();
+//$cid = '32049';//52';//create_customer($tok);
+//get_products($tok);
+//create_product($tok,1);
+//create_reservation($tok,$cid);
+ /*if(user_is_anonymous()){
+    $res = _lightspeed_restaurant_get_customer($tok,trim($reserv['email']));
+    $values['fname'] = "".$form['field_reservation_name']['und'][0]['value']['#value'];
+    $values['lname'] = "".$form['field_reservation_lastname']['und'][0]['value']['#value'];
+    $values['phone'] = "".$form['field_reservation_phone']['und'][0]['value']['#value'];
+    $values['email'] = "".$form['field_reservation_email']['und'][0]['email']['#value'];
+    if(empty($res['results'])){
+          $cid = _lightspeed_restaurant_create_customer($tok, $values);
+    }else{
+          $cid = $res['results'][0]['id']; 
+    }
+  }elseif(user_is_logged_in()){
+    global $user;
+    $user_full = user_load($user->uid); // user_load(uid) returns the complete array
+    $res = _lightspeed_restaurant_get_customer($tok,trim($user->mail));
+    $values['fname'] = "".$user_full->field_given_name['und'][0]['value'];
+    $values['lname'] = "".$user_full->field_lastname['und'][0]['value'];
+    $values['phone'] = "".$user_full->field_telephone['und'][0]['value'];
+    $values['email'] = "".$user->mail;
+    if(empty($res['results'])){
+          $cid = _lightspeed_restaurant_create_customer($tok, $values);
+    }else{
+          $cid = $res['results'][0]['id']; 
+    }
+    
+  }
+
+
+
 $resultado = _lightspeed_restaurant_create_order($tok,$cid,$ordered_items);
-}
-
-/*
-function lightspeed_restaurant_form_eck__entity__form_add_reservation_reservation_submit($form, &$form_state) {
-$filename = '/tmp/reservation.txt';
-// var_dump
-ob_start();
-var_dump($form);
-//var_dump($form_state);
-//var_dump($form_id);
-$debug_dump = ob_get_clean();
-//$debug_dump = var_export($result, true);
-try{ 
-$file = fopen($filename, "w");
-fwrite($file, $debug_dump. PHP_EOL);
-//fwrite($file, "".$params['creationDate'] .  PHP_EOL);
-fclose($file);
-} catch(Exception $e) {
-       echo("Error :". $e->getMessage());
-}
-
 }*/
+
