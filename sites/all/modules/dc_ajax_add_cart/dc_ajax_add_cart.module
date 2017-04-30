@@ -480,7 +480,7 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
     $product_price_total = commerce_currency_format($variables['total']['amount'], $currency['code']);
     $i=0;//1;
     // Create the line item list and products array.
-    foreach ($variables['line_items'] as $line_item_wrapper) {
+    foreach ($variables['line_items'] as /*$i =>*/ $line_item_wrapper) {
       $line_item = $line_item_wrapper->value();
 
       // If the line item is a product.

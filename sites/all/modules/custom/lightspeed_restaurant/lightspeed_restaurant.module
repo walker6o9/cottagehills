@@ -557,21 +557,50 @@ $ordered_items=array();
      /********************** GET CART CURRENCY AND TOTALS ****************************************/ 
      $currency = commerce_currency_load(commerce_default_currency());
      $product_price_total = commerce_currency_format($total['amount'], $total['currency_code']); 
+      
+      $sides_per_product=array();
+      $sides_per_product = get_sides_per_product($order->commerce_line_items['und'][$i]['line_item_id']);
         
-      $temp =  array (
-      'productId' => $ligthspeed_product_id,
-      'amount' => intval($unit_quantity),
-      'totalPrice' => $total['amount']/100,
-      'totalPriceWithoutVat' =>$total['amount']/100,
-      'unitPrice' => floatval($unit_price),
-      'unitPriceWithoutVat' => floatval($unit_price),
-       );
+      $tok = _lightspeed_restaurant_get_token();
+  
+      if(!empty($sides_per_product)){      
+        //if(count($sides_per_product)==intval($unit_quantity)){
+            foreach($sides_per_product as $key => $spp){
+                $spp_with_attributes = sides_to_modifiers($sides_per_product[$key],$ligthspeed_product_id,$tok);
+                
+                $temp =  array (
+                'productId' => $ligthspeed_product_id,
+                'amount' => intval($unit_quantity)/count($sides_per_product),
+                'totalPrice' => $total['amount']/100,
+                'totalPriceWithoutVat' =>$total['amount']/100,
+                'unitPrice' => floatval($unit_price),///count($sides_per_product),
+                'unitPriceWithoutVat' => floatval($unit_price),///count($sides_per_product),
+                'modifiers' => array($spp_with_attributes),
+                 );
+                  //array_push($temp,$spp_with_attributes);////here it is the modifier
+                 array_push($ordered_items,$temp);
+          
+            }
+        //}elseif(count($sides_per_product)<intval($unit_quantity)){
+            
+        //}    
+      }else{
+            $temp =  array (
+            'productId' => $ligthspeed_product_id,
+            'amount' => intval($unit_quantity),
+            'totalPrice' => $total['amount']/100,
+            'totalPriceWithoutVat' =>$total['amount']/100,
+            'unitPrice' => floatval($unit_price),///count($sides_per_product),
+            'unitPriceWithoutVat' => floatval($unit_price),///count($sides_per_product),
+             );
+              //array_push($temp,$spp_with_attributes);////here it is the modifier
+             array_push($ordered_items,$temp);
+      }  
         
-        array_push($ordered_items,$temp);
+        
     }
 
 //MAIN CODE
-$tok = _lightspeed_restaurant_get_token();
 //$cid = '32049';//52';//create_customer($tok);
 //get_products($tok);
 //create_product($tok,1);
@@ -606,7 +635,7 @@ $tok = _lightspeed_restaurant_get_token();
  $resultado = _lightspeed_restaurant_create_order($tok,$cid,$ordered_items);
  //return $resultado;
 }
-
+/*****************************************************************************/
 function   _lightspeed_restaurant_save_on_temp($values){
 global $user;
 $uid = $user->uid;  
@@ -625,9 +654,82 @@ if(empty($orden)){
   //'created' => REQUEST_TIME,
 ))
 ->execute();
+ }   
 }
 
+/*****************************************************************************/
+
+function get_sides_per_product($line_item_id){
+    $sidespp=array();
+        $query = db_select('commerce_line_item', 'n')
+        ->fields('n', array('side'))
+        ->condition('line_item_id',  $line_item_id,'=');
+        $result = $query->execute();
+        $sidespp = json_decode($result->fetchField());
     
+    return $sidespp;
+}
+/*****************************************************************************/
+function sides_to_modifiers($spp,$prod_id,$tok){
+    $mod_id='';
+    $prod_with_modifiers =  get_modifiers($tok,$prod_id);
+    $only_modifiers = $prod_with_modifiers['additions'][0]['values'];
+    $modv_id = $prod_with_modifiers['additions'][0]['id'];
+    foreach($only_modifiers as $key => $value){
+        if(strcasecmp(urldecode($spp), $only_modifiers[$key]['info']) == 0){
+           $mod_id =  $only_modifiers[$key]['id'];break;
+        }
+    }
+    
+    $modifier = array(
+          'modifierId' => $mod_id,
+          'modifierValueId' => $modv_id,
+          'description' => urldecode($spp),
+          'modifierName' => urldecode($spp),
+          'price' => 0.00,
+          'priceWithoutVat' => 0.00,
+        );
+  return $modifier;
+}
+
+
+//************************************************
+//    Function Get Modifiers
+//************************************************
+
+function get_modifiers($token,$prodid){
+global $companyId,$deviceId,$password,$username,$DEBUG;
+
+$uri = "http://staging-exact-integration.posios.com/PosServer/rest/inventory/product/".$prodid;//".$id."/product";
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL,$uri);
+//curl_setopt($ch, CURLOPT_POST, 1);
+//curl_setopt($ch, CURLOPT_POSTFIELDS,$data_string);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+'Content-Type: application/json',
+'Accept: */*',
+'X-Auth-Token:'. $token,
+//'customer'. $cid,
+//'Content-Length: ' . strlen($data_string)
+)
+); 
+$result = curl_exec($ch);
+//$result = json_decode($result, true);
+//Get Access Token on Successful Setup & Initialization of the User
+//if($DEBUG==1)print_r($result);
+$result = json_decode($result,true);
+//if($DEBUG==1)/*print_r($result);*/var_dump($result);echo '<br><pre>';
+//print_r($result);
+//echo '</pre>';
+//$access_token = $result['token'];
+//if($DEBUG==1)echo("<br>ACCESS TOKEN:". $access_token);
+
+
+
+curl_close($ch);
+return $result;
+
 }
 
 //************************************************

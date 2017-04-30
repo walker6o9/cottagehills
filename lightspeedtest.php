@@ -374,7 +374,44 @@ curl_close($ch);
 //return $access_token;
 
 }
+//************************************************
+//    Function Get Modifiers
+//************************************************
 
+function get_modifiers($token){
+global $companyId,$deviceId,$password,$username,$DEBUG;
+
+$uri = "http://staging-exact-integration.posios.com/PosServer/rest/inventory/product/137150";//".$id."/product";
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL,$uri);
+//curl_setopt($ch, CURLOPT_POST, 1);
+//curl_setopt($ch, CURLOPT_POSTFIELDS,$data_string);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+'Content-Type: application/json',
+'Accept: */*',
+'X-Auth-Token:'. $token,
+//'customer'. $cid,
+//'Content-Length: ' . strlen($data_string)
+)
+); 
+$result = curl_exec($ch);
+//$result = json_decode($result, true);
+//Get Access Token on Successful Setup & Initialization of the User
+//if($DEBUG==1)print_r($result);
+$result = json_decode($result,true);
+if($DEBUG==1)/*print_r($result);*/var_dump($result);echo '<br><pre>';
+print_r($result);
+echo '</pre>';
+//$access_token = $result['token'];
+//if($DEBUG==1)echo("<br>ACCESS TOKEN:". $access_token);
+
+
+
+curl_close($ch);
+return $result;
+
+}
 
 //************************************************
 //    Function Get Products
@@ -419,6 +456,7 @@ return $result;
 $tok = get_token();
 $cid = '32052';//create_customer($tok);
 get_products($tok);
+get_modifiers($tok);
 //create_product($tok,1);
 //create_reservation($tok,$cid);
 //$order = create_order($tok,$cid);
