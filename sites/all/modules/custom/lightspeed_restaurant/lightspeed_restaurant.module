@@ -514,7 +514,7 @@ $ordered_items=array();
         ->fields('n', array('data'))
         ->condition('order_id',  $order->order_id,'=');
         $result = $query->execute();
-        $customer = json_decode($result->fetchField());
+        $customer = json_decode($result->fetchField(),true);
 
 /********************** GET LIGHTSPEED PRODUCT ID ****************************************/
     for($i=0;$i<count($order->commerce_line_items['und']);$i++){// as $key => $line_item_wrapper) {
