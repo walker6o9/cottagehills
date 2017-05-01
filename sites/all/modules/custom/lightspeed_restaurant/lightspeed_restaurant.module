@@ -164,7 +164,7 @@ $params = array(
   "reservationName"=> $reserv['name'],//"New Reservation",
   "seats"=> $reserv['party_size'],//2,
   "startTime"=> $reserv['date'],//"2017-03-24T13:00:00Z",
-  "status"=> "TO_CHECK",
+  "status"=> "CONFIRMED",//"TO_CHECK",
   "tableId"=> "1",
   "telephone"=> $reserv['phone'],//"33333333"
 );

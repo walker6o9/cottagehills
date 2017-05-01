@@ -400,7 +400,8 @@ $result = curl_exec($ch);
 //Get Access Token on Successful Setup & Initialization of the User
 //if($DEBUG==1)print_r($result);
 $result = json_decode($result,true);
-if($DEBUG==1)/*print_r($result);*/var_dump($result);echo '<br><pre>';
+if($DEBUG==1)/*print_r($result);*/var_dump($result);
+echo '<br><pre>';
 print_r($result);
 echo '</pre>';
 //$access_token = $result['token'];
@@ -439,10 +440,12 @@ $result = curl_exec($ch);
 //Get Access Token on Successful Setup & Initialization of the User
 //if($DEBUG==1)print_r($result);
 $result = json_decode($result,true);
-if($DEBUG==1)/*print_r($result);*/var_dump($result);
+if($DEBUG==1)/*print_r($result);*///var_dump($result);
 //$access_token = $result['token'];
 //if($DEBUG==1)echo("<br>ACCESS TOKEN:". $access_token);
-
+echo '<br><pre>';
+print_r($result);
+echo '</pre>';
 
 
 curl_close($ch);
