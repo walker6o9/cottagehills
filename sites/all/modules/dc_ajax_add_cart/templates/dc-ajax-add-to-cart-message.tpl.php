@@ -149,11 +149,13 @@
                   ?>
   		</select>
       </div>
-      <div class="option-button-wrapper">
-        <div class="option-button checkout"><?php print $checkout_link; ?></div>
-        <div class="option-button continue" data-dismiss="add-cart-message"><?php print $configuration['popup_continue_shopping']; ?></div>
-      </div>
-    <?php  } }
+
+    <?php  } }?>
+    <div class="option-button-wrapper">
+      <div class="option-button checkout"><?php print $checkout_link; ?></div>
+      <div class="option-button continue" data-dismiss="add-cart-message"><?php print $configuration['popup_continue_shopping']; ?></div>
+    </div>
+    <?php
       if ($configuration['popup_product_price_display'] == 1) : ?>
       <div class="product-cost-incl-tax">
         <?php if ($configuration['popup_product_price_label'] == 'display_label') : ?>

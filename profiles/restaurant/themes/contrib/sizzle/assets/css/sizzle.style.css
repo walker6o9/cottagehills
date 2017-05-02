@@ -10254,3 +10254,38 @@ ul.footer-nav {
 .checkout-review.table .pane-title:first-of-type{
     display: none;
 }
+
+.grid-price{
+    display: none;
+}
+
+.grid-title .grid-price{
+    display: inline;
+}
+
+.checkout-buttons .btn-default{
+    margin-bottom: 0px;
+}
+
+.ajax-shopping-cart-more-info{
+    text-align: right;
+}
+
+.dc-ajax-add-cart-checkout-link{
+    padding: 5px;
+    border: 1px solid black;
+}
+
+#ajax-shopping-cart-total{
+    margin-bottom: 4px;
+}
+
+.checkout-completion-message{
+    color: #000;
+    font-weight: bold;
+}
+
+.title.clear-margin--top.margin--md--bottom{
+    font-weight: bold;
+    color: #000;
+}

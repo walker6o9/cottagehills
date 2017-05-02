@@ -1009,7 +1009,7 @@ function commerce_checkout_completion_message_default() {
   }
   else {
     // Otherwise select a fallback format and use a plain text default value.
-    $value = 'Your order number is [commerce-order:order-number]. You will receive a confirmation email shortly.';
+    $value = 'Your order number is [commerce-order:order-number]. You will receive a confirmation email shortly!';
     $format = filter_fallback_format();
   }
 
