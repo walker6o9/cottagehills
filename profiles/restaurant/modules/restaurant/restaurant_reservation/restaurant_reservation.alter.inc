@@ -11,6 +11,13 @@ function restaurant_reservation_form_eck__entity__form_add_reservation_reservati
   // When the form is not shown on admin pages, make some changes.
   if (!drupal_match_path(current_path(), "admin/structure/entity-type/reservation/reservation/*")) {
     // Set the status to pending by default.
+  /*$tz = new DateTimeZone($form['field_reservation_date']['und'][0]['#date_items']['timezone']);
+  $now = new DateTime($form['field_reservation_date']['und'][0]['#date_items']['value'],$tz);
+  $PostQopen = new DateTime();$PostQopen->setTimestamp(strtotime('today 01:00am'));
+  $PostQClose = new DateTime();$PostQClose->setTimestamp(strtotime('tomorrow 01:00am'));
+
+//if($PostQopen <= $now && $PostQClose >=$now){*/
+   
     $language = $form['field_reservation_status']['#language'];
     $form['field_reservation_status'][$language]['#value'] = 'pending';
     $form['field_reservation_status'][$language]['#access'] = FALSE;
@@ -30,6 +37,13 @@ function restaurant_reservation_form_eck__entity__form_add_reservation_reservati
 
     // Add a custom submit callback.
     $form['#submit'][] = 'restaurant_reservation_form_eck__entity__form_add_reservation_reservation_submit';
+/*}else{
+
+drupal_set_message(t("We only accept Reservations from from 11am to 1am"));
+}*/
+
+
+
   }
 }
 
@@ -48,7 +62,12 @@ function restaurant_reservation_form_eck__entity__form_add_reservation_reservati
 
   //ligthspeed implementation
   $tz = new DateTimeZone($form['field_reservation_date']['und'][0]['#date_items']['timezone']);
-  $now = new DateTime($form['field_reservation_date']['und'][0]['#date_items']['value'],$tz);
+  $now = new DateTime($form['field_reservation_date']['und'][0]['#entity']->field_reservation_date['und'][0]['value'],$tz);//'#default_value']['value'],$tz);
+  $now->modify('-5 hour');
+  $PostQopen = new DateTime();$PostQopen->setTimestamp(strtotime('today 11:00am'));
+  $PostQClose = new DateTime();$PostQClose->setTimestamp(strtotime('tomorrow 01:00am'));
+
+if($PostQopen <= $now && $PostQClose >=$now){
   $in_an_hour = clone $now;
   $in_an_hour->modify('+1 hour');
   $reserv = array();
@@ -91,5 +110,9 @@ function restaurant_reservation_form_eck__entity__form_add_reservation_reservati
     
   }
   $reservation = _lightspeed_restaurant_create_reservation($tok,$cid,$reserv);
+}else{
+
+drupal_set_message(t("We only accept Reservations from from 11am to 1am"));
+}
 
 }

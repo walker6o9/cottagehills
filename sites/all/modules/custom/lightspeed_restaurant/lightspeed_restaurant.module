@@ -2,13 +2,14 @@
 error_reporting(E_ALL); 
 ini_set('display_errors','1');
  
- /*$companyId=14431;
- $deviceId="api";
- $password="bK6Vre2QtGZdZ5q7";
- $username="staging@stevekemph.com";*/
  $DEBUG = 0;
+ /*define("url","http://naw1.posios.com");
+define("companyId", 31185);
+define("deviceId", "api");
+define("password", "SteveK26");
+define("username", "steve@stevekemph.com");*/
 
-
+define("url", "http://staging-exact-integration.posios.com");
 define("companyId", 14431);
 define("deviceId", "api");
 define("password", "bK6Vre2QtGZdZ5q7");
@@ -30,7 +31,7 @@ $data_string = json_encode($params);
 
 //GET TOKEN
 if($DEBUG==1)print_r($data_string);
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/token";
+$uri = url . "/PosServer/rest/token";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 curl_setopt($ch, CURLOPT_POST, 1);
@@ -122,7 +123,7 @@ $data_string = json_encode($params);
 
 //CREATE CUSTOMER
 if($DEBUG==1)print_r($data_string);
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/core/customer";
+$uri = url . "/PosServer/rest/core/customer";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 curl_setopt($ch, CURLOPT_POST, 1);
@@ -171,7 +172,7 @@ $params = array(
 $data_string = json_encode($params);
 
 if($DEBUG==1)print_r($data_string);
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/reservation";
+$uri = url . "/PosServer/rest/reservation";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 curl_setopt($ch, CURLOPT_POST, 1);
@@ -247,7 +248,7 @@ $params = array(
 $data_string = json_encode($params);
 
 if($DEBUG==1)print_r($data_string);
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/inventory/productgroup/".$gid."/product";
+$uri = url . "/PosServer/rest/inventory/productgroup/".$gid."/product";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 curl_setopt($ch, CURLOPT_POST, 1);
@@ -360,7 +361,7 @@ $data_string = json_encode($params);
 
 //GET TOKEN
 if($DEBUG==1)print_r($data_string);
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/onlineordering/customer/".$cid."/establishmentorder";
+$uri = url . "/PosServer/rest/onlineordering/customer/".$cid."/establishmentorder";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 curl_setopt($ch, CURLOPT_POST, 1);
@@ -410,7 +411,7 @@ return $result;
 function _lightspeed_restaurant_get_products($token){
 global $DEBUG;
 
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/inventory/product";
+$uri = url . "/PosServer/rest/inventory/product";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 //curl_setopt($ch, CURLOPT_POST, 1);
@@ -441,9 +442,7 @@ return $result;
 function _lightspeed_restaurant_get_customer($token,$email){
 global $DEBUG;
 
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/onlineordering/customer?email=".urlencode($email);
-        //    http://staging-exact-integration.posios.com/PosServer/rest/onlineordering/customer?email=omar%40ramsesiden.net
-        //GET http://staging-exact-integration.posios.com/PosServer/rest/onlineordering/customer?email=omar%40ramsesiden.net
+$uri = url . "/PosServer/rest/onlineordering/customer?email=".urlencode($email);
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 //curl_setopt($ch, CURLOPT_POST, 1);
@@ -700,7 +699,7 @@ function sides_to_modifiers($spp,$prod_id,$tok){
 function get_modifiers($token,$prodid){
 global $companyId,$deviceId,$password,$username,$DEBUG;
 
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/inventory/product/".$prodid;//".$id."/product";
+$uri = url . "/PosServer/rest/inventory/product/".$prodid;//".$id."/product";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 //curl_setopt($ch, CURLOPT_POST, 1);
@@ -719,114 +718,7 @@ $result = curl_exec($ch);
 //Get Access Token on Successful Setup & Initialization of the User
 //if($DEBUG==1)print_r($result);
 $result = json_decode($result,true);
-//if($DEBUG==1)/*print_r($result);*/var_dump($result);echo '<br><pre>';
-//print_r($result);
-//echo '</pre>';
-//$access_token = $result['token'];
-//if($DEBUG==1)echo("<br>ACCESS TOKEN:". $access_token);
-
-
-
 curl_close($ch);
 return $result;
 
 }
-
-//************************************************
-//    HOOK  
-//************************************************
-/*function _lightspeed_restaurant_commerce_checkout_complete($order){
-$ordered_items=array();
-
-/********************** GET LIGHTSPEED PRODUCT ID ****************************************
-    for($i=0;$i<count($order->commerce_line_items['und']);$i++){// as $key => $line_item_wrapper) {
-      //$line_item = $line_item_wrapper->value();
-        $query = db_select('field_data_commerce_product', 'n')
-        ->fields('n', array('commerce_product_product_id'))
-        ->condition('entity_id',  $order->commerce_line_items['und'][$i]['line_item_id'],'=');
-        $result = $query->execute();
-        $pid = $result->fetchField();
-      
-        $query = db_select('field_data_field_menu_variants', 'n')
-        ->fields('n', array('entity_id'))
-        ->condition('field_menu_variants_product_id', $pid,'=');
-        $result = $query->execute();
-        $nid = $result->fetchField();
-        
-        $query = db_select('field_data_field_lightspeed_code', 'n')
-        ->fields('n', array('field_lightspeed_code_value'))
-        ->condition('entity_id', $nid,'=');
-        $result = $query->execute();
-        $ligthspeed_product_id= $result->fetchField();
-
-    /********************** GET UNIT PRICE ****************************************
-        $query = db_select('field_data_commerce_unit_price', 'n')
-        ->fields('n', array('commerce_unit_price_amount'))
-        ->condition('entity_id',  $order->commerce_line_items['und'][$i]['line_item_id'],'=');
-        $result = $query->execute();
-        $unit_price = $result->fetchField()/100;
-    /********************** GET UNIT QUANTITY ****************************************
-        $query = db_select('commerce_line_item', 'n')
-        ->fields('n', array('quantity'))
-        ->condition('line_item_id',  $order->commerce_line_items['und'][$i]['line_item_id'],'=');
-        $result = $query->execute();
-        $unit_quantity = $result->fetchField();    
-     /********************** GET CART QUANTITY AND TOTALS ****************************************
-    $wrapper = entity_metadata_wrapper('commerce_order', $order);
-    $line_items = $wrapper->commerce_line_items;
-    $quantity = commerce_line_items_quantity($line_items, commerce_product_line_item_types());
-    $total = commerce_line_items_total($line_items);
-     /********************** GET CART CURRENCY AND TOTALS **************************************** 
-     $currency = commerce_currency_load(commerce_default_currency());
-     $product_price_total = commerce_currency_format($total['amount'], $total['currency_code']); 
-        
-      $temp =  array (
-      'productId' => $ligthspeed_product_id,
-      'amount' => intval($unit_quantity),
-      'totalPrice' => $total['amount']/100,
-      'totalPriceWithoutVat' =>$total['amount']/100,
-      'unitPrice' => floatval($unit_price),
-      'unitPriceWithoutVat' => floatval($unit_price),
-       );
-        
-        array_push($ordered_items,$temp);
-    }
-
-//MAIN CODE
-/*$tok = _lightspeed_restaurant_get_token();
-//$cid = '32049';//52';//create_customer($tok);
-//get_products($tok);
-//create_product($tok,1);
-//create_reservation($tok,$cid);
- /*if(user_is_anonymous()){
-    $res = _lightspeed_restaurant_get_customer($tok,trim($reserv['email']));
-    $values['fname'] = "".$form['field_reservation_name']['und'][0]['value']['#value'];
-    $values['lname'] = "".$form['field_reservation_lastname']['und'][0]['value']['#value'];
-    $values['phone'] = "".$form['field_reservation_phone']['und'][0]['value']['#value'];
-    $values['email'] = "".$form['field_reservation_email']['und'][0]['email']['#value'];
-    if(empty($res['results'])){
-          $cid = _lightspeed_restaurant_create_customer($tok, $values);
-    }else{
-          $cid = $res['results'][0]['id']; 
-    }
-  }elseif(user_is_logged_in()){
-    global $user;
-    $user_full = user_load($user->uid); // user_load(uid) returns the complete array
-    $res = _lightspeed_restaurant_get_customer($tok,trim($user->mail));
-    $values['fname'] = "".$user_full->field_given_name['und'][0]['value'];
-    $values['lname'] = "".$user_full->field_lastname['und'][0]['value'];
-    $values['phone'] = "".$user_full->field_telephone['und'][0]['value'];
-    $values['email'] = "".$user->mail;
-    if(empty($res['results'])){
-          $cid = _lightspeed_restaurant_create_customer($tok, $values);
-    }else{
-          $cid = $res['results'][0]['id']; 
-    }
-    
-  }
-
-
-
-$resultado = _lightspeed_restaurant_create_order($tok,$cid,$ordered_items);
-}*/
-
