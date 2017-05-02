@@ -25,7 +25,8 @@ function restaurant_reservation_field_group_info() {
     'children' => array(
       0 => 'field_reservation_email',
       1 => 'field_reservation_name',
-      2 => 'field_reservation_phone',
+      2 => 'field_reservation_lastname',
+      3 => 'field_reservation_phone',
     ),
     'format_type' => 'fieldset',
     'format_settings' => array(

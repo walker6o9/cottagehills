@@ -173,7 +173,7 @@ function restaurant_reservation_update_status_form($form, &$form_state, $reserva
   $current_status = $form_state['#current_status'] = entity_metadata_wrapper('reservation', $reservation)->field_reservation_status->value();
 
   $description = t('An email will be sent to %name when you change the status. You can customize the email template !here.', array(
-    '%name' => $wrapper->field_reservation_name->value(),
+    '%name' => $wrapper->field_reservation_name->value().' '.$wrapper->field_reservation_lastname->value(),
     '!here' => l(t('here'), '/admin/config/restaurant/reservation'),
   ));
 

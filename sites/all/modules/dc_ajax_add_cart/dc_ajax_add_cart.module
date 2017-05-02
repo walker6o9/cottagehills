@@ -32,8 +32,9 @@ define('DC_AJAX_ADD_CART_POPUP_PRODUCT_TOTAL_LABEL', 'dc_ajax_add_cart_popup_pro
 define('DC_AJAX_ADD_CART_POPUP_CHECKOUT', 'dc_ajax_add_cart_popup_checkout');
 define('DC_AJAX_ADD_CART_POPUP_CONTINUE_SHOPPING', 'dc_ajax_add_cart_popup_continue_shopping');
 define('DC_AJAX_ADD_CART_POPUP_PRODUCT_SIDES', 'dc_ajax_add_cart_popup_product_sides');
-
-$pid = array(0 => "test");
+define('DC_AJAX_ADD_CART_LINE_ITEM_ID', 'dc_ajax_add_cart_line_item_id');
+define('DC_AJAX_ADD_CART_ORDER_ID', 'dc_ajax_add_cart_order_id');
+$led = ""; $_order_id="";
 /**
  * Implements hook_permission().
  */
@@ -131,44 +132,6 @@ function dc_ajax_add_cart_remove_commerce_line_item($ajax, $line_item_id) {
   // Check whether this is AJAX callback.
   $is_ajax = $ajax === 'ajax';
 
-
-  
-   /*************** Hacked code ************************/
-  $query = db_select('commerce_line_item', 'n')
-        ->fields('n', array('line_item_label'))
-        ->condition('line_item_id', $line_item_id,'=');
-        $result = $query->execute();
-        $var = $result->fetchField();
-  $query = db_select('commerce_product', 'n')
-        ->fields('n', array('title'))
-        ->condition('sku', $var,'=');
-        $result = $query->execute();
-        $product_mid_name = $result->fetchField();
-       if (isset($_COOKIE['productname']) and isset($_COOKIE['lid'])){
-          $Pname = $_COOKIE['productname'];
-          $Pname= urldecode($Pname);
-          $pname = array();
-          $pname = json_decode($Pname);
-          
-          $Lid = $_COOKIE['lid'];
-          $Lid= urldecode($Lid);
-          $lid = array();
-          $lid = json_decode($Lid);
-          foreach($pname as $i => $item) {
-              $b=explode(":",$pname[$i])[1];
-              if (strpos($b, $product_mid_name) !== false){
-                unset($pname[$i]);
-                unset($lid[$i]);
-                $pname = array_values($pname);
-                $lid = array_values($lid);
-                $json = json_encode($pname);
-                setcookie("productname", $json, 0, '/');
-                $json = json_encode($lid);
-                setcookie("lid", $json, 0, '/');                
-              }
-          }
-  }
-      /*************** End Hacked code ************************/
   // Delete the product line item from cart.
   commerce_cart_order_product_line_item_delete($order, $line_item_id);
 
@@ -187,19 +150,6 @@ function dc_ajax_add_cart_remove_commerce_line_item($ajax, $line_item_id) {
       $content_cart = '';
     }
     else {
-      
-      /*******************  ADDED *************************/
-       $j=1;
-       foreach ($line_items as $line_item) {
-       $product = entity_metadata_wrapper('commerce_line_item', $line_item)->commerce_product->value();//commerce_product_load($line_item->commerce_product[LANGUAGE_NONE][0]['product_id']);
-          if(/*$line_item->line_item_label*/$product->sku == $lid[$j]){
-            $product->title = /*$product->title. "<br><b>Side: </b>". $current_side;*/trim(explode($product->title,$pname[$j])[1]);
-            if($j<count($pname))$j++;
-          }
-	  }
-      /******************** END ADDED **********************/
-      
-      
       $content_cart = theme('dc_ajax_shopping_cart', array(
         'order' => $commerce_cart['order'],
         'line_items' => $line_items,
@@ -304,7 +254,9 @@ function dc_ajax_add_cart_ajax_cart_form(&$form, &$form_state) {
       $last_line_item = $form_state['line_item'];
       $last_line_item_product = commerce_product_load($form_state['values']['product_id']);
       $last_line_item_quantity = $form_state['values']['quantity'];
-
+      $led=$last_line_item->line_item_id;
+      //dsm($led);
+      
       $content = theme('dc_ajax_add_to_cart_message', array(
         'line_item' => $last_line_item,
         'product' => $last_line_item_product,
@@ -526,24 +478,23 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
     $shipping = array();
 
     $product_price_total = commerce_currency_format($variables['total']['amount'], $currency['code']);
-    $i=1;
+    $i=0;//1;
     // Create the line item list and products array.
-    foreach ($variables['line_items'] as $line_item_wrapper) {
+    foreach ($variables['line_items'] as /*$i =>*/ $line_item_wrapper) {
       $line_item = $line_item_wrapper->value();
 
       // If the line item is a product.
       if (property_exists($line_item, 'commerce_product')) {
+        global $led;
+        $led=$line_item->line_item_id;  
         $product = commerce_product_load($line_item->commerce_product[LANGUAGE_NONE][0]['product_id']);
         $products[$product->product_id] = $product;
         $product_prices[$product->product_id] = commerce_currency_format($line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'], $currency['code']);
-          
-        //dpm($product);
-    
+
     /*************** Hacked code ************************/
-        $car_li_id = $line_item->line_item_id;
        $query = db_select('field_data_commerce_product', 'n')
         ->fields('n', array('commerce_product_product_id'))
-        ->condition('entity_id', $car_li_id,'=');
+        ->condition('entity_id', $led,'=');
         $result = $query->execute();
         $var = $result->fetchField();
   
@@ -558,39 +509,44 @@ function template_preprocess_dc_ajax_shopping_cart(&$variables) {
         ->condition('nid', $product_id,'=');
         $result = $query->execute();
         $alt_title = $result->fetchField();
-        
-        if (isset($_COOKIE['productname']) and isset($_COOKIE['lid'])){
-          $Pname = $_COOKIE['productname'];
-          $Pname= urldecode($Pname);
+        $order_condition=$variables['order']->order_id;
+
+       $query = db_select('commerce_line_item', 'n')
+        ->fields('n', array('middle'))
+        ->condition('line_item_id', $led/*$line_item->line_item*/,'=');
+        $result = $query->execute();
+        $middle = json_decode(rawurldecode($result->fetchField()));
+        /*!empty($middle)?*/$mid=$middle;//$mid=$product->title;
+
           $pname = array();
-          $pname = json_decode($Pname);
-          
-          $Lid = $_COOKIE['lid'];
-          $Lid= urldecode($Lid);
+          $pname = _dc_ajax_add_cart_get_saved_sides_per_order($order_condition);
+          //json_decode($Pname);
+
           $lid = array();
-          $lid = json_decode($Lid);
-          //if($i>= count($lid))$lid[$i]="";
-          if($line_item->line_item_label == $lid[$i]){
+          $lid = _dc_ajax_add_cart_get_saved_skus_per_order($order_condition);//json_decode($Lid);
 
-            $product->title = trim($pname[$i]);
-           
-            $side_updated = db_update('commerce_line_item') // Table name no longer needs {}
-  				->fields(array(
-    			'side' => explode("<br><b>Side: </b>",$pname[$i])[1],
-  				))
-  				->condition('line_item_id',  $car_li_id, '=')
-  				->execute();
-
-
-            if($i<count($pname))$i++;
+          if($line_item->line_item_label==$lid[$i]){
+            $pname_side=array();
             
+            $pname_side= json_decode(/*utf8_encode(*/$pname[$i]/*)*/,true);
+            if(!empty($pname_side)){//explode("<br>",$pname[$i]);
+            
+                    $temp="";
+                    foreach ($pname_side as $key => $value) {
+                        $temp = $temp  . "<br>".((int)$key+1).")". rawurldecode($pname_side[$key]);//. "<br>";
+                    }
+                    
+                    $product->title = '<b>'.$alt_title  . ':</b> '. $mid/*explode("1)",explode("</b>",$product->title)[0]/*)[0]*/ . $temp;/*."<br><b>Side: </b>"*///.$pname[$i];
+      
+                    if($i<count($pname))$i++;
+            }else{
+               $product->title = '<b>'.$alt_title  . ':</b> '. $product->title ;
+            }
           }else{
             $product->title = '<b>'.$alt_title  . ':</b> '. $product->title ;
           }
-        }else{
-           $product->title = '<b>'.$alt_title  . ':</b> '. $product->title ;
-        }
-     /*************** Hacked code ************************/
+
+     /***************End Hacked code ************************/
         
       // If line item is shipping service.
       }elseif (property_exists($line_item, 'commerce_shipping_service')) {
@@ -760,9 +716,7 @@ function template_preprocess_dc_ajax_add_to_cart_message(&$variables) {
 
   $variables['product_per_unit_price'] = commerce_currency_format($product_price['amount'], $currency['code']);
   $variables['product_price_total'] = commerce_currency_format($variables['quantity'] * $product_price['amount'], $currency['code']);
-   global $pid;
-   $pid = _dc_ajax_add_cart_get_sides($variables['product']->product_id);
-  //dpm("this is the pid:".$pid);
+  global $led,$_order_id;
   // Create new theme variables related to configuration.
   $variables['configuration']['success_message'] = check_plain(variable_get(DC_AJAX_ADD_CART_SUCCESS_MESSAGE, t('Item successfully added to cart')));
   $variables['configuration']['popup_checkout'] = check_plain(variable_get(DC_AJAX_ADD_CART_POPUP_CHECKOUT, t('Go to checkout')));
@@ -777,32 +731,10 @@ function template_preprocess_dc_ajax_add_to_cart_message(&$variables) {
   $variables['configuration']['popup_product_quantity_label'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_QUANTITY_LABEL, 'display_label');
   $variables['configuration']['popup_product_total_display'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_TOTAL_DISPLAY, 1);
   $variables['configuration']['popup_product_total_label'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_TOTAL_LABEL, 'display_label');
-  $variables['configuration']['popup_select_sides'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_SIDES, $pid);
+  $variables['configuration']['popup_select_sides'] = variable_get(DC_AJAX_ADD_CART_POPUP_PRODUCT_SIDES, _dc_ajax_add_cart_get_available_sides_per_menu($variables['product']->product_id));
+  $variables['configuration']['led'] = variable_get(DC_AJAX_ADD_CART_LINE_ITEM_ID, $led);
+  $variables['configuration']['order_id'] = variable_get(DC_AJAX_ADD_CART_ORDER_ID,$_order_id); 
 }
-
-function _dc_ajax_add_cart_get_sides($var){
-
-        $query = db_select('field_data_field_menu_variants', 'n')
-        ->fields('n', array('entity_id'))
-        ->condition('field_menu_variants_product_id', $var,'=');
-        $result = $query->execute();
-        $product_id = $result->fetchField();
-        $query = db_select('field_data_field_list_of_sides', 'n')
-        ->fields('n', array('field_list_of_sides_value'))
-        ->condition('entity_id', $product_id,'=');
-        $result = $query->execute();
-        $sides = $result->fetchField();
-        $sides = explode("\n", $sides);
-        foreach ($sides as $key => $value) {
-          if (empty($value)) {
-             unset($sides[$key]);
-          }
-        }
-          if (!empty($sides)) {
-             return $sides;
-          }
-}
-
 
 /**
  * Rebuild add to cart form.
@@ -963,9 +895,90 @@ function dc_ajax_add_cart_command_html($selector, $html) {
   );
 }
 
+///CUSTOM FUNCTIONS
+
 function dc_ajax_add_cart_commerce_checkout_complete(){
                  $json="";
                  setcookie("productname", $json, 0, '/');
                  setcookie("lid", $json, 0, '/');                
   
+}
+
+function _dc_ajax_add_cart_get_available_sides_per_menu($var){
+
+        $query = db_select('field_data_field_menu_variants', 'n')
+        ->fields('n', array('entity_id'))
+        ->condition('field_menu_variants_product_id', $var,'=');
+        $result = $query->execute();
+        $product_id = $result->fetchField();
+        $query = db_select('field_data_field_list_of_sides', 'n')
+        ->fields('n', array('field_list_of_sides_value'))
+        ->condition('entity_id', $product_id,'=');
+        $result = $query->execute();
+        $sides = $result->fetchField();
+        $sides = explode("\n", $sides);
+
+        foreach ($sides as $key => $value) {
+          if (empty($value)) {
+             unset($sides[$key]);
+          }
+        }
+        
+          if (!empty($sides)) {
+             return $sides;
+          }
+}
+
+function _dc_ajax_add_cart_get_saved_sides_per_order($order_id){
+
+        global $_order_id;
+        $_order_id=$order_id;
+        $query = db_select('commerce_line_item', 'n')
+        ->fields('n', array('side'))
+        ->condition('order_id', $order_id,'=')
+        ->isNotNull('side');
+        
+        $result = $query->execute();
+        $sides_in_order = $result->fetchAllAssoc('side',PDO::FETCH_ASSOC);
+        
+        if (is_array($sides_in_order) || is_object($sides_in_order))
+        {
+        foreach ($sides_in_order as $key => $value) {
+          if (empty($value)) {
+             unset($sides_in_order[$key]);
+          }
+        }
+        }
+        $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($sides_in_order));
+        $list = iterator_to_array($it,false);
+        
+        if (!empty($list)){
+             return $list;
+          }
+
+}
+
+function _dc_ajax_add_cart_get_saved_skus_per_order($order_id){
+        $query = db_select('commerce_line_item', 'n')
+        ->fields('n', array('line_item_label'))
+        ->condition('order_id', $order_id,'=')
+        ->isNotNull('side');
+        
+        $result = $query->execute();
+        $sides_in_order = $result->fetchAllAssoc('line_item_label',PDO::FETCH_ASSOC);
+        if (is_array($sides_in_order) || is_object($sides_in_order))
+        {
+        foreach ($sides_in_order as $key => $value) {
+          if (empty($value)) {
+             unset($sides_in_order[$key]);
+          }
+        }
+        }
+        $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($sides_in_order));
+        $list = iterator_to_array($it,false);
+        
+        if (!empty($list)){
+             return $list;
+          }
+          
 }

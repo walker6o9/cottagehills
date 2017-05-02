@@ -49,7 +49,6 @@
       </div>
     </div>
   </nav>
-
   <main id="main" class="main">
     <?php if ($messages): ?>
       <div id="messages" class="container margin--sm--top">

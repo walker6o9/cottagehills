@@ -297,6 +297,63 @@ function restaurant_reservation_field_default_field_instances() {
     ),
   );
 
+  // Exported field_instance: 'reservation-reservation-field_reservation_lastname'
+  $field_instances['reservation-reservation-field_reservation_lastname'] = array(
+    'bundle' => 'reservation',
+    'custom_add_another' => '',
+    'custom_remove' => '',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
+      'email' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 3,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'reservation',
+    'fences_wrapper' => 'no_wrapper',
+    'field_name' => 'field_reservation_lastname',
+    'label' => 'Lastname',
+    'required' => 1,
+    'settings' => array(
+      'custom_add_another' => '',
+      'custom_remove' => '',
+      'linkit' => array(
+        'button_text' => 'Search',
+        'enable' => 0,
+        'profile' => '',
+      ),
+      'text_processing' => 0,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'size' => 60,
+      ),
+      'type' => 'text_textfield',
+      'weight' => 3,
+    ),
+  );
+
   // Exported field_instance: 'reservation-reservation-field_reservation_number'
   $field_instances['reservation-reservation-field_reservation_number'] = array(
     'bundle' => 'reservation',

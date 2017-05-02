@@ -11,6 +11,13 @@ function restaurant_reservation_form_eck__entity__form_add_reservation_reservati
   // When the form is not shown on admin pages, make some changes.
   if (!drupal_match_path(current_path(), "admin/structure/entity-type/reservation/reservation/*")) {
     // Set the status to pending by default.
+  /*$tz = new DateTimeZone($form['field_reservation_date']['und'][0]['#date_items']['timezone']);
+  $now = new DateTime($form['field_reservation_date']['und'][0]['#date_items']['value'],$tz);
+  $PostQopen = new DateTime();$PostQopen->setTimestamp(strtotime('today 01:00am'));
+  $PostQClose = new DateTime();$PostQClose->setTimestamp(strtotime('tomorrow 01:00am'));
+
+//if($PostQopen <= $now && $PostQClose >=$now){*/
+   
     $language = $form['field_reservation_status']['#language'];
     $form['field_reservation_status'][$language]['#value'] = 'pending';
     $form['field_reservation_status'][$language]['#access'] = FALSE;
@@ -30,6 +37,13 @@ function restaurant_reservation_form_eck__entity__form_add_reservation_reservati
 
     // Add a custom submit callback.
     $form['#submit'][] = 'restaurant_reservation_form_eck__entity__form_add_reservation_reservation_submit';
+/*}else{
+
+drupal_set_message(t("We only accept Reservations from from 11am to 1am"));
+}*/
+
+
+
   }
 }
 
@@ -45,4 +59,60 @@ function restaurant_reservation_form_eck__entity__form_add_reservation_reservati
 
   // Redirect to the reservation page.
   $form_state['redirect'] = current_path();
+
+  //ligthspeed implementation
+  $tz = new DateTimeZone($form['field_reservation_date']['und'][0]['#date_items']['timezone']);
+  $now = new DateTime($form['field_reservation_date']['und'][0]['#entity']->field_reservation_date['und'][0]['value'],$tz);//'#default_value']['value'],$tz);
+  $now->modify('-5 hour');
+  $PostQopen = new DateTime();$PostQopen->setTimestamp(strtotime('today 11:00am'));
+  $PostQClose = new DateTime();$PostQClose->setTimestamp(strtotime('tomorrow 01:00am'));
+
+if($PostQopen <= $now && $PostQClose >=$now){
+  $in_an_hour = clone $now;
+  $in_an_hour->modify('+1 hour');
+  $reserv = array();
+  $reserv['date'] = $now->format('c');
+  $reserv['date_end'] =  $in_an_hour->format('c');
+  $reserv['message'] = "".$form['field_reservation_message']['und'][0]['value']['#value'];
+  $reserv['name'] = "".$form['field_reservation_name']['und'][0]['value']['#value'];
+  $reserv['lastname'] =$form['field_reservation_lastname']['und'][0]['value']['#value']; "".
+  $reserv['party_size'] = "".$form['field_reservation_party_size']['und'][0]['value']['#value'];
+  $reserv['phone'] = "".$form['field_reservation_phone']['und'][0]['value']['#value'];
+  $reserv['email'] = "".$form['field_reservation_email']['und'][0]['email']['#value'];
+  
+  $tok = _lightspeed_restaurant_get_token();
+
+  if(user_is_anonymous()){
+    $res = _lightspeed_restaurant_get_customer($tok,trim($reserv['email']));
+    $values['fname'] = "".$form['field_reservation_name']['und'][0]['value']['#value'];
+    $values['lname'] = "".$form['field_reservation_lastname']['und'][0]['value']['#value'];
+    $values['phone'] = "".$form['field_reservation_phone']['und'][0]['value']['#value'];
+    $values['email'] = "".$form['field_reservation_email']['und'][0]['email']['#value'];
+    if(empty($res['results'])){
+          $cid = _lightspeed_restaurant_create_customer($tok, $values);
+    }else{
+          $cid = $res['results'][0]['id']; 
+    }
+  }elseif(user_is_logged_in()){
+    global $user;
+    $user_full = user_load($user->uid); // user_load(uid) returns the complete array
+    $res = _lightspeed_restaurant_get_customer($tok,trim($user->mail));
+    $values['fname'] = "".$user_full->field_given_name['und'][0]['value'];
+    $values['lname'] = "".$user_full->field_lastname['und'][0]['value'];
+    $values['phone'] = "".$user_full->field_telephone['und'][0]['value'];
+    $values['email'] = "".$user->mail;
+    //$cid = '32049';
+    if(empty($res['results'])){
+          $cid = _lightspeed_restaurant_create_customer($tok, $values);
+    }else{
+          $cid = $res['results'][0]['id']; 
+    }
+    
+  }
+  $reservation = _lightspeed_restaurant_create_reservation($tok,$cid,$reserv);
+}else{
+
+drupal_set_message(t("We only accept Reservations from from 11am to 1am"));
+}
+
 }

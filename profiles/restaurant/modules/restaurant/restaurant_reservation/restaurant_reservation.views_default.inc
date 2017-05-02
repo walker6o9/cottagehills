@@ -35,6 +35,7 @@ function restaurant_reservation_views_default_views() {
   $handler->display->display_options['style_options']['columns'] = array(
     'field_reservation_number' => 'field_reservation_number',
     'field_reservation_name' => 'field_reservation_name',
+    'field_reservation_lastname' => 'field_reservation_lastname',
     'field_reservation_date' => 'field_reservation_date',
     'field_reservation_party_size' => 'field_reservation_party_size',
     'field_reservation_phone' => 'field_reservation_phone',
@@ -52,6 +53,13 @@ function restaurant_reservation_views_default_views() {
       'empty_column' => 0,
     ),
     'field_reservation_name' => array(
+      'sortable' => 1,
+      'default_sort_order' => 'asc',
+      'align' => '',
+      'separator' => '',
+      'empty_column' => 0,
+    ),
+    'field_reservation_lastname' => array(
       'sortable' => 1,
       'default_sort_order' => 'asc',
       'align' => '',
@@ -128,6 +136,15 @@ function restaurant_reservation_views_default_views() {
   $handler->display->display_options['fields']['field_reservation_name']['element_wrapper_type'] = '0';
   $handler->display->display_options['fields']['field_reservation_name']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_reservation_name']['field_api_classes'] = TRUE;
+    /* Field: Reservation: Lastname */
+  $handler->display->display_options['fields']['field_reservation_lastname']['id'] = 'field_reservation_lastname';
+  $handler->display->display_options['fields']['field_reservation_lastname']['table'] = 'field_data_field_reservation_lastname';
+  $handler->display->display_options['fields']['field_reservation_lastname']['field'] = 'field_reservation_lastname';
+  $handler->display->display_options['fields']['field_reservation_lastname']['element_type'] = '0';
+  $handler->display->display_options['fields']['field_reservation_lastname']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_reservation_lastname']['element_wrapper_type'] = '0';
+  $handler->display->display_options['fields']['field_reservation_lastname']['element_default_classes'] = FALSE;
+  $handler->display->display_options['fields']['field_reservation_lastname']['field_api_classes'] = TRUE;
   /* Field: Reservation: Location */
   $handler->display->display_options['fields']['field_reservation_location']['id'] = 'field_reservation_location';
   $handler->display->display_options['fields']['field_reservation_location']['table'] = 'field_data_field_reservation_location';
@@ -234,6 +251,29 @@ function restaurant_reservation_views_default_views() {
   $handler->display->display_options['filters']['field_reservation_name_value']['expose']['autocomplete_raw_suggestion'] = 1;
   $handler->display->display_options['filters']['field_reservation_name_value']['expose']['autocomplete_raw_dropdown'] = 1;
   $handler->display->display_options['filters']['field_reservation_name_value']['expose']['autocomplete_dependent'] = 0;
+    /* Filter criterion: Reservation: Name (field_reservation_lastname) */
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['id'] = 'field_reservation_lastname_value';
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['table'] = 'field_data_field_reservation_lastname';
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['field'] = 'field_reservation_lastname_value';
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['operator'] = 'allwords';
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['exposed'] = TRUE;
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['expose']['operator_id'] = 'field_reservation_lastname_value_op';
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['expose']['label'] = 'Lastname';
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['expose']['operator'] = 'field_reservation_lastname_value_op';
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['expose']['identifier'] = 'lastname';
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['expose']['remember_roles'] = array(
+    2 => '2',
+    1 => 0,
+    4 => 0,
+    6 => 0,
+    3 => 0,
+  );
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['expose']['autocomplete_items'] = '10';
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['expose']['autocomplete_min_chars'] = '0';
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['expose']['autocomplete_field'] = 'field_reservation_lastname';
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['expose']['autocomplete_raw_suggestion'] = 1;
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['expose']['autocomplete_raw_dropdown'] = 1;
+  $handler->display->display_options['filters']['field_reservation_lastname_value']['expose']['autocomplete_dependent'] = 0;
   /* Filter criterion: Reservation: Reservation number (field_reservation_number) */
   $handler->display->display_options['filters']['field_reservation_number_value']['id'] = 'field_reservation_number_value';
   $handler->display->display_options['filters']['field_reservation_number_value']['table'] = 'field_data_field_reservation_number';
@@ -306,6 +346,7 @@ function restaurant_reservation_views_default_views() {
   $handler->display->display_options['style_options']['max_items'] = '0';
   $handler->display->display_options['style_options']['multiday_hidden'] = array(
     'field_reservation_name' => 'field_reservation_name',
+    'field_reservation_lastname' => 'field_reservation_lastname',
     'field_reservation_party_size' => 'field_reservation_party_size',
     'field_reservation_phone' => 'field_reservation_phone',
     'field_reservation_email' => 'field_reservation_email',
@@ -317,6 +358,7 @@ function restaurant_reservation_views_default_views() {
   $handler->display->display_options['row_options']['inline'] = array(
     'field_reservation_number' => 'field_reservation_number',
     'field_reservation_name' => 'field_reservation_name',
+    'field_reservation_lastname' => 'field_reservation_lastname',
     'field_reservation_party_size' => 'field_reservation_party_size',
   );
   $handler->display->display_options['defaults']['row_options'] = FALSE;
@@ -371,6 +413,17 @@ function restaurant_reservation_views_default_views() {
   $handler->display->display_options['fields']['field_reservation_name']['element_wrapper_type'] = '0';
   $handler->display->display_options['fields']['field_reservation_name']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_reservation_name']['field_api_classes'] = TRUE;
+  /* Field: Reservation: LastName */
+  $handler->display->display_options['fields']['field_reservation_lastname']['id'] = 'field_reservation_lastname';
+  $handler->display->display_options['fields']['field_reservation_lastname']['table'] = 'field_data_field_reservation_lastname';
+  $handler->display->display_options['fields']['field_reservation_lastname']['field'] = 'field_reservation_lastname';
+  $handler->display->display_options['fields']['field_reservation_lastname']['label'] = '';
+  $handler->display->display_options['fields']['field_reservation_lastname']['alter']['trim_whitespace'] = TRUE;
+  $handler->display->display_options['fields']['field_reservation_lastname']['element_type'] = 'h4';
+  $handler->display->display_options['fields']['field_reservation_lastname']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_reservation_lastname']['element_wrapper_type'] = '0';
+  $handler->display->display_options['fields']['field_reservation_lastname']['element_default_classes'] = FALSE;
+  $handler->display->display_options['fields']['field_reservation_lastname']['field_api_classes'] = TRUE;
   /* Field: Reservation: Status */
   $handler->display->display_options['fields']['field_reservation_status']['id'] = 'field_reservation_status';
   $handler->display->display_options['fields']['field_reservation_status']['table'] = 'field_data_field_reservation_status';
