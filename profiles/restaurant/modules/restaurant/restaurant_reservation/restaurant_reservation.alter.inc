@@ -108,14 +108,14 @@ if($PostQopen <= $now && $PostQClose >=$now){
 
    $body = '<html>
                <body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" bgcolor="#ffffff" >
-               <p>Cottage Hillstation</p><br>
-               <p>Date: '.$reserv['date'].'</p><br>
-               <p>Name: '.$values['fname'].'</p><br>
-               <p>Lastname: '.$values['lname'].'</p><br>
-               <p>Message: '.$reserv['message'].'</p><br>
-               <p>Party size: '.$reserv['party_size'].'</p><br>
-               <p>Telephone: '.$values['phone'].'</p><br>
-               <p>email: '.$values['email'].'</p><br>
+               <p> Cottage Hillstation</p><br>
+               <p> Date: '.$now->format('g:ia \o\n l jS F Y').'</p><br>
+               <p> Name: '.$values['fname'].'</p><br>
+               <p> Lastname: '.$values['lname'].'</p><br>
+               <p> Message: '.$reserv['message'].'</p><br>
+               <p> Party size: '.$reserv['party_size'].'</p><br>
+               <p> Telephone: '.$values['phone'].'</p><br>
+               <p> email: '.$values['email'].'</p><br>
                </body></html>';
      
                $my_module = 'restaurant_reservation';
@@ -142,12 +142,12 @@ if($PostQopen <= $now && $PostQClose >=$now){
                 
    $body = '<html>
                <body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" bgcolor="#ffffff" >
-               <p>Cottage Hillstation</p><br>
-               <p>We have received your reservation.</p><br>
-               <p>Date: '.$reserv['date'].'</p><br>
-               <p>Name: '.$values['fname'].'</p><br>
-               <p>Lastname: '.$values['lname'].'</p><br>
-               <p>email: '.$values['email'].'</p><br>
+               <p> Cottage Hillstation</p><br>
+               <p> We have received your reservation.</p><br>
+               <p> Date: '.$now->format('g:ia \o\n l jS F Y').'</p><br>
+               <p> Name: '.$values['fname'].'</p><br>
+               <p> Lastname: '.$values['lname'].'</p><br>
+               <p> email: '.$values['email'].'</p><br>
                </body></html>';
      
                $my_module = 'restaurant_reservation';
