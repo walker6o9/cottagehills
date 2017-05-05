@@ -63,6 +63,7 @@ if($PostQopen <= $now && $PostQClose >=$now){
   $in_an_hour = clone $now;
   $in_an_hour->modify('+1 hour');
   $reserv = array();
+  $values = array();
   $reserv['date'] = $now->format('c');
   $reserv['date_end'] =  $in_an_hour->format('c');
   $reserv['message'] = "".$form['field_reservation_message']['und'][0]['value']['#value'];
@@ -109,12 +110,12 @@ if($PostQopen <= $now && $PostQClose >=$now){
                <body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" bgcolor="#ffffff" >
                <p>Cottage Hillstation</p><br>
                <p>Date: '.$reserv['date'].'</p><br>
-               <p>Name: '.$reserv['name'].'</p><br>
-               <p>Lastname: '.$reserv['lastname'].'</p><br>
+               <p>Name: '.$values['fname'].'</p><br>
+               <p>Lastname: '.$values['lname'].'</p><br>
                <p>Message: '.$reserv['message'].'</p><br>
                <p>Party size: '.$reserv['party_size'].'</p><br>
-               <p>Telephone: '.$reserv['phone'].'</p><br>
-               <p>email: '.$reserv['email'].'</p><br>
+               <p>Telephone: '.$values['phone'].'</p><br>
+               <p>email: '.$values['email'].'</p><br>
                </body></html>';
      
                $my_module = 'restaurant_reservation';
