@@ -1,17 +1,27 @@
 <?php
-error_reporting(E_ALL); 
+error_reporting(E_ALL);
 ini_set('display_errors','1');
- $companyId=14431;
+//Dev info
+/* $companyId=14431;
  $deviceId="api";
  $password="bK6Vre2QtGZdZ5q7";
  $username="staging@stevekemph.com";
+ $url=$url . "";
+ $DEBUG = 1;
+*/
+//Prod Info
+ $companyId=31185;
+ $deviceId="api";
+ $password="SteveK26";
+ $username="steve@stevekemph.com";
+ $url = "http://naw1.posios.com";
  $DEBUG = 1;
 
 //************************************************
 //********** GET TOKEN ***************************
 //************************************************
 function get_token(){
-global $companyId,$deviceId,$password,$username,$DEBUG;
+global $companyId,$deviceId,$password,$username,$DEBUG,$url;
 //$DEBUG =0;
 $params = array("companyId"=>$companyId,
 				"deviceId" =>$deviceId,
@@ -24,7 +34,7 @@ $data_string = json_encode($params);
 
 //GET TOKEN
 if($DEBUG==1)print_r($data_string);
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/token";
+$uri = $url . "/PosServer/rest/token";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 curl_setopt($ch, CURLOPT_POST, 1);
@@ -34,7 +44,7 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 'Content-Type: application/json',
 'Accept: */*',
 'Content-Length: ' . strlen($data_string))
-); 
+);
 $result = curl_exec($ch);
 //$result = json_decode($result, true);
 //Get Access Token on Successful Setup & Initialization of the User
@@ -53,7 +63,7 @@ return $access_token;
 //*********** CREATE CUSTOMER ********************
 //************************************************
 function create_customer($token){
-global $companyId,$deviceId,$password,$username,$DEBUG;
+global $companyId,$deviceId,$password,$username,$DEBUG,$url;
 
 //$DEBUG =0;
 $params = array(/*
@@ -61,7 +71,7 @@ $params = array(/*
   "companyId" => $companyId,
   "country" => "USA",
   "credits" => 0,
-  "customerCards" => array(    
+  "customerCards" => array(
       "code"=> "",
       "companyId"=> $companyId,
       "creationUserId"=> 0,
@@ -116,7 +126,7 @@ $data_string = json_encode($params);
 
 //CREATE CUSTOMER
 if($DEBUG==1)print_r($data_string);
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/core/customer";
+$uri = $url . "/PosServer/rest/core/customer";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 curl_setopt($ch, CURLOPT_POST, 1);
@@ -127,7 +137,7 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 'Accept: */*',
 'X-Auth-Token:'. $token,
 'Content-Length: ' . strlen($data_string))
-); 
+);
 $result = curl_exec($ch);
 if($DEBUG==1)print_r($result);
 echo "<br><br>";
@@ -143,7 +153,7 @@ return $customer_id;
 //********** CREATE RESERVATION ******************
 //************************************************
 function create_reservation($token,$cid){
-global $companyId,$deviceId,$password,$username,$DEBUG;
+global $companyId,$deviceId,$password,$username,$DEBUG,$url;
 
 //$DEBUG =0;
 //status = {CANCELLED, SEATED, UNKNOWN, ON_HOLD, TO_CHECK, CONFIRMED}
@@ -165,7 +175,7 @@ $params = array(
 $data_string = json_encode($params);
 
 if($DEBUG==1)print_r($data_string);
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/reservation";
+$uri = $url . "/PosServer/rest/reservation";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 curl_setopt($ch, CURLOPT_POST, 1);
@@ -176,7 +186,7 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 'Accept: */*',
 'X-Auth-Token:'. $token,
 'Content-Length: ' . strlen($data_string))
-); 
+);
 $result = curl_exec($ch);
 //$result = json_decode($result, true);
 //Get Access Token on Successful Setup & Initialization of the User
@@ -241,7 +251,7 @@ $params = array(
 $data_string = json_encode($params);
 
 if($DEBUG==1)print_r($data_string);
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/inventory/productgroup/".$gid."/product";
+$uri = $url . "/PosServer/rest/inventory/productgroup/".$gid."/product";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 curl_setopt($ch, CURLOPT_POST, 1);
@@ -253,7 +263,7 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 'X-Auth-Token:'. $token,
 'id:'.$gid,
 'Content-Length: ' . strlen($data_string))
-); 
+);
 $result = curl_exec($ch);
 //$result = json_decode($result, true);
 //Get Access Token on Successful Setup & Initialization of the User
@@ -275,7 +285,7 @@ function create_order($token,$cid){
 global $companyId,$deviceId,$password,$username,$DEBUG;
 
 //$DEBUG =1;
-$params = 
+$params =
 array (
   'companyId' => $companyId,
   'customerId' => $cid,
@@ -284,9 +294,9 @@ array (
   'deliveryDate' => '2017-04-17T19:45:00-05:00',
   'status' => 'ACCEPTED',
   'description' => 'YPDine OO',
-  'orderItems' => 
+  'orderItems' =>
   array (
-    0 => 
+    0 =>
     array (
       'productId' => 137050,
       'amount' => 1,
@@ -294,9 +304,9 @@ array (
       'totalPriceWithoutVat' => 12,
       'unitPrice' => 6.78,
       'unitPriceWithoutVat' => 6,
-      'modifiers' => 
+      'modifiers' =>
       array (
-        0 => 
+        0 =>
         array (
           'modifierId' => 1830,
           'modifierValueId' => 5947,
@@ -305,7 +315,7 @@ array (
           'price' => 3.39,
           'priceWithoutVat' => 3,
         ),
-        1 => 
+        1 =>
         array (
           'modifierId' => 1830,
           'modifierValueId' => 5948,
@@ -316,7 +326,7 @@ array (
         ),
       ),
     ),
-    1 => 
+    1 =>
     array (
       'productId' => 137050,
       'amount' => 1,
@@ -326,15 +336,15 @@ array (
       'unitPriceWithoutVat' => 5,
     ),
   ),
- /* 'orderPayment' => 
+ /* 'orderPayment' =>
   array (
     'amount' => 1,
     'paymentTypeId' => 4138,
     'paymentTypeTypeId' => 1,
   ),*/
-  'orderTaxInfo' => 
+  'orderTaxInfo' =>
   array (
-    0 => 
+    0 =>
     array (
       'tax' => 0.13,
       'taxRate' => 0.13,
@@ -349,7 +359,7 @@ $data_string = json_encode($params);
 
 //GET TOKEN
 if($DEBUG==1)print_r($data_string);
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/onlineordering/customer/".$cid."/establishmentorder";
+$uri = $url . "/PosServer/rest/onlineordering/customer/".$cid."/establishmentorder";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 curl_setopt($ch, CURLOPT_POST, 1);
@@ -361,7 +371,7 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 'X-Auth-Token:'. $token,
 'customer'. $cid,
 'Content-Length: ' . strlen($data_string))
-); 
+);
 $result = curl_exec($ch);
 //$result = json_decode($result, true);
 //Get Access Token on Successful Setup & Initialization of the User
@@ -381,7 +391,7 @@ curl_close($ch);
 function get_modifiers($token){
 global $companyId,$deviceId,$password,$username,$DEBUG;
 
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/inventory/product/137150";//".$id."/product";
+$uri = $url . "/PosServer/rest/inventory/product/137150";//".$id."/product";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 //curl_setopt($ch, CURLOPT_POST, 1);
@@ -394,7 +404,7 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 //'customer'. $cid,
 //'Content-Length: ' . strlen($data_string)
 )
-); 
+);
 $result = curl_exec($ch);
 //$result = json_decode($result, true);
 //Get Access Token on Successful Setup & Initialization of the User
@@ -419,9 +429,9 @@ return $result;
 //************************************************
 
 function get_products($token){
-global $companyId,$deviceId,$password,$username,$DEBUG;
+global $companyId,$deviceId,$password,$username,$DEBUG,$url;
 
-$uri = "http://staging-exact-integration.posios.com/PosServer/rest/inventory/product";
+$uri = $url . "/PosServer/rest/inventory/product";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL,$uri);
 //curl_setopt($ch, CURLOPT_POST, 1);
@@ -434,7 +444,7 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 //'customer'. $cid,
 //'Content-Length: ' . strlen($data_string)
 )
-); 
+);
 $result = curl_exec($ch);
 //$result = json_decode($result, true);
 //Get Access Token on Successful Setup & Initialization of the User
