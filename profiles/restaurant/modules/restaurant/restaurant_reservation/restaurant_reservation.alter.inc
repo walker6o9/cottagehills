@@ -123,7 +123,7 @@ if($PostQopen <= $now && $PostQClose >=$now){
 	       $from = 'me@gmail.com';
 	       
                $message = array(
-		 'to' => '"'.addslashes(mime_header_encode('Test')) .'"<'.$user_fields->mail.'>',
+		 'to' => '"'.addslashes(mime_header_encode('Reservation')) .'"<'.$user_fields->mail.'>',
 		 'subject' => t('New Reservation has been created'),
 		 'body' => $body,
 		 'headers' => array(
@@ -139,7 +139,38 @@ if($PostQopen <= $now && $PostQClose >=$now){
 	       else {
 		 // Failure.
 		}
-
+                
+   $body = '<html>
+               <body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" bgcolor="#ffffff" >
+               <p>Cottage Hillstation</p><br>
+               <p>We have received your reservation.</p><br>
+               <p>Date: '.$reserv['date'].'</p><br>
+               <p>Name: '.$values['fname'].'</p><br>
+               <p>Lastname: '.$values['lname'].'</p><br>
+               <p>email: '.$values['email'].'</p><br>
+               </body></html>';
+     
+               $my_module = 'restaurant_reservation';
+	       $my_mail_token = '';
+	       $from = 'cottagehillstation@gmail.com';
+	       
+               $message = array(
+		 'to' => '"'.addslashes(mime_header_encode('Reservation')) .'"<'.$values['email'].'>',
+		 'subject' => t('You reservation has been received'),
+		 'body' => $body,
+		 'headers' => array(
+		 'From' => 'cottagehillstation@gmail.com',
+		 'MIME-Version' => '1.0',
+		 'Content-Type' => 'text/html;charset=utf-8',),
+	       );
+	      
+               $system = drupal_mail_system($my_module, $my_mail_token);
+	       if ($system->mail($message)) {
+	        	// Success.
+	       }
+	       else {
+		 // Failure.
+		}
 }else{
     drupal_set_message(t("We only accept Reservations from from 8:30am to 10:30pm"));
     
