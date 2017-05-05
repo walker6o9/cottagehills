@@ -11,12 +11,6 @@ function restaurant_reservation_form_eck__entity__form_add_reservation_reservati
   // When the form is not shown on admin pages, make some changes.
   if (!drupal_match_path(current_path(), "admin/structure/entity-type/reservation/reservation/*")) {
     // Set the status to pending by default.
-  /*$tz = new DateTimeZone($form['field_reservation_date']['und'][0]['#date_items']['timezone']);
-  $now = new DateTime($form['field_reservation_date']['und'][0]['#date_items']['value'],$tz);
-  $PostQopen = new DateTime();$PostQopen->setTimestamp(strtotime('today 01:00am'));
-  $PostQClose = new DateTime();$PostQClose->setTimestamp(strtotime('tomorrow 01:00am'));
-
-//if($PostQopen <= $now && $PostQClose >=$now){*/
 
     $language = $form['field_reservation_status']['#language'];
     $form['field_reservation_status'][$language]['#value'] = 'pending';
@@ -37,13 +31,6 @@ function restaurant_reservation_form_eck__entity__form_add_reservation_reservati
 
     // Add a custom submit callback.
     $form['#submit'][] = 'restaurant_reservation_form_eck__entity__form_add_reservation_reservation_submit';
-/*}else{
-
-drupal_set_message(t("We only accept Reservations from from 11am to 1am"));
-}*/
-
-
-
   }
 }
 
@@ -51,11 +38,12 @@ drupal_set_message(t("We only accept Reservations from from 11am to 1am"));
  * Custom submit callback for reservation form.
  */
 function restaurant_reservation_form_eck__entity__form_add_reservation_reservation_submit($form, &$form_state) {
+  global $user;
   // Clear all messages.
   drupal_get_messages();
 
   // Show a custom message.
-  drupal_set_message(panopoly_config_get('reservation_form_success_message', ''));
+  //drupal_set_message(panopoly_config_get('reservation_form_success_message', ''));
 
   // Redirect to the reservation page.
   $form_state['redirect'] = current_path();
@@ -98,7 +86,6 @@ if($PostQopen <= $now && $PostQClose >=$now){
           $cid = $res['results'][0]['id'];
     }
   }elseif(user_is_logged_in()){
-    global $user;
     $user_full = user_load($user->uid); // user_load(uid) returns the complete array
     $res = _lightspeed_restaurant_get_customer($tok,trim($user->mail));
     $values['fname'] = "".$user_full->field_given_name['und'][0]['value'];
@@ -114,8 +101,47 @@ if($PostQopen <= $now && $PostQClose >=$now){
 
   }
   $reservation = _lightspeed_restaurant_create_reservation($tok,$cid,$reserv);
+  drupal_set_message(panopoly_config_get('reservation_form_success_message', ''));
+  
+  $user_fields = user_load(1);
+
+   $body = '<html>
+               <body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" bgcolor="#ffffff" >
+               <p>Cottage Hillstation</p><br>
+               <p>Date: '.$reserv['date'].'</p><br>
+               <p>Name: '.$reserv['name'].'</p><br>
+               <p>Lastname: '.$reserv['lastname'].'</p><br>
+               <p>Message: '.$reserv['message'].'</p><br>
+               <p>Party size: '.$reserv['party_size'].'</p><br>
+               <p>Telephone: '.$reserv['phone'].'</p><br>
+               <p>email: '.$reserv['email'].'</p><br>
+               </body></html>';
+     
+               $my_module = 'restaurant_reservation';
+	       $my_mail_token = '';
+	       $from = 'me@gmail.com';
+	       
+               $message = array(
+		 'to' => '"'.addslashes(mime_header_encode('Test')) .'"<'.$user_fields->mail.'>',
+		 'subject' => t('New Reservation has been created'),
+		 'body' => $body,
+		 'headers' => array(
+		 'From' => 'me@gmail.com',
+		 'MIME-Version' => '1.0',
+		 'Content-Type' => 'text/html;charset=utf-8',),
+	       );
+	      
+               $system = drupal_mail_system($my_module, $my_mail_token);
+	       if ($system->mail($message)) {
+	        	// Success.
+	       }
+	       else {
+		 // Failure.
+		}
+
 }else{
     drupal_set_message(t("We only accept Reservations from from 8:30am to 10:30pm"));
+    
 }
 
 }

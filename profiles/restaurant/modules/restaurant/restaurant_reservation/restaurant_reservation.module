@@ -233,7 +233,7 @@ function restaurant_reservation_update_status_form_submit($form, &$form_state) {
  */
 function restaurant_reservation_entity_insert($entity) {
   if (isset($entity->type) && $entity->type == 'reservation') {
-    restaurant_reservation_send_update_status_mail($entity);
+    //restaurant_reservation_send_update_status_mail($entity);
   }
 }
 
